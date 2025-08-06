@@ -1,0 +1,37 @@
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 16px 40px;
+  border-bottom: 1px solid #ddd;
+}
+
+.logo {
+  font-weight: bold;
+  color: #673ab7;
+  font-size: 18px;
+}
+
+.search-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.search-profile input {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.profile-circle {
+  background: #673ab7;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}

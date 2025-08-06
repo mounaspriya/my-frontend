@@ -1,0 +1,59 @@
+.gbit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 16px 40px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.gbit-logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.gbit-tabs {
+  display: flex;
+  gap: 20px;
+}
+
+.tab {
+  padding: 8px 24px;
+  border-radius: 25px;
+  background: #f1f1f1;
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.gbit-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.search-icon {
+  font-size: 18px;
+  color: #333;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+}

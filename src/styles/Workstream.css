@@ -1,0 +1,84 @@
+.workstream-container {
+  padding: 30px;
+}
+
+.workstream-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.workstream-card {
+  width: 200px;
+  padding: 16px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.workstream-card:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.workstream-card.selected {
+  border: 2px solid #1f77ff;
+}
+
+.add-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #1f77ff;
+  border: 2px dashed #1f77ff;
+  background: #f0f7ff;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.modal-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px; right: 10px;
+  font-size: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-buttons button:first-child {
+  background: #1f77ff;
+  color: white;
+}
+
+.modal-buttons button:last-child {
+  background: #ccc;
+}

@@ -1,0 +1,152 @@
+/* Reset and font */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f6f8;
+}
+
+/* Sidebar layout */
+.admin-dashboard-container {
+  justify-content: center;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background-color: #fff;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h2 {
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+
+.sidebar nav a {
+  display: block;
+  margin: 10px 0;
+  text-decoration: none;
+  color: #444;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.sidebar nav a:hover {
+  color: #007bff;
+}
+
+/* Main layout */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f4f6f8;
+  min-height: 100vh; /* ensure it stretches full height */
+  overflow-y: auto;
+  padding-bottom: 30px;
+}
+
+/* TopBar */
+.topbar {
+  background-color: white;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.topbar input[type="text"] {
+  padding: 10px;
+  width: 300px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.topbar .profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-circle {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cards Grid */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 24px; /* changed from margin */
+}
+
+.card {
+  background: linear-gradient(135deg, #e6f0ff, #ffffff);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+  border-left: 5px solid #007bff;
+}
+
+.card h4 {
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* Graph and table section */
+.bottom-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  padding: 0 24px 24px; /* changed from margin */
+}
+
+.chart-box {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  min-height: 260px;
+}
+.avatar-circle {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Scroll handling */
+.main-content::-webkit-scrollbar {
+  width: 6px;
+}
+.main-content::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}

@@ -1,0 +1,24 @@
+.card {
+  background: #fff;
+  padding: 20px;
+  width: 180px;
+  border-radius: 12px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  cursor: pointer;
+}
+
+.card.active {
+  border: 2px solid #673ab7;
+  background-color: #f3eefe;
+}
+
+.card .icon {
+  font-size: 24px;
+  color: #673ab7;
+}
+
+.card.add-new {
+  border: 2px dashed #ccc;
+  color: #aaa;
+}
