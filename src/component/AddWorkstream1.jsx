@@ -1748,7 +1748,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 import { Upload, AlertCircle, Trash2 } from "lucide-react"
-import "../styles/form.css"
+import "../styles/Form.css"
 
 export default function ReviewerForm() {
   // Helper function to get Friday of any given week using pure string manipulation
