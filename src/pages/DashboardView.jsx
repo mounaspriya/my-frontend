@@ -792,9 +792,6 @@ const styles = {
     fontSize: "14px",
   },
  
-  navButtonInactive: {
-    color: "#6b7280",
-  },
   headerRight: {
     display: "flex",
     alignItems: "center",
