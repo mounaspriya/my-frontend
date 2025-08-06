@@ -791,9 +791,7 @@ const styles = {
     fontWeight: "500",
     fontSize: "14px",
   },
-  navButtonActive: {
-    color: "#2563eb",
-  },
+ 
   navButtonInactive: {
     color: "#6b7280",
   },
