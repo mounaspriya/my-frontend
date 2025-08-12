@@ -3,34 +3,16 @@
 
 
 
+
 // "use client"
 
 // import { useState, useEffect } from "react"
 // import axios from "axios"
 // import "../styles/Form.css"
-// import { useCurrencies } from '../hooks/useCurrencies'
-// import { getCurrencyDisplayName } from '../utils/currencyUtils'
+// import { useCurrencies } from "../hooks/useCurrencies"
+// import { getCurrencyDisplayName } from "../utils/currencyUtils"
 
-// export default function Workstream2Form() {
-//   const [activeWorkstream, setActiveWorkstream] = useState("02")
-
-//   const handleExpiryDateChange = (value) => {
-//     // Remove any non-digit characters
-//     let cleaned = value.replace(/\D/g, '')
-    
-//     // Add slash after 2 digits
-//     if (cleaned.length >= 2) {
-//       cleaned = cleaned.substring(0, 2) + '/' + cleaned.substring(2, 4)
-//     }
-    
-//     // Limit to MM/YY format
-//     if (cleaned.length > 5) {
-//       cleaned = cleaned.substring(0, 5)
-//     }
-    
-//     handleInputChange("expiryDate", cleaned)
-//   }
-
+// export default function EditWorkstream2Form({ recordId, onBack, onSave }) {
 //   const [formData, setFormData] = useState({
 //     // ===== WORKSTREAM 2 SPECIFIC FIELDS =====
 //     caseNo: "", // Case No. (Number - unique id)
@@ -59,13 +41,15 @@
 //     logGenerated: "", // Log generated Y/N (dropdown) - Now with N/A
 //   })
 
+//   const [loading, setLoading] = useState(true)
+//   const [error, setError] = useState(null)
 //   const [isSubmitting, setIsSubmitting] = useState(false)
 //   const { currencies, loading: currenciesLoading, error: currenciesError } = useCurrencies()
 
 //   // Updated dropdown options for Workstream 2 - All now have Yes/No/N/A
 //   const dropdownOptions = {
 //     testedCurrency: currencies,
-//     comments: ["Yes","No","NA"],
+//     comments: ["Yes", "No", "NA"],
 //     notTestedBreakup: [
 //       "Not Tested breakup",
 //       "Not Tested - CC option unavailable",
@@ -80,16 +64,93 @@
 //       "Not Tested - Not Reportable",
 //       "Not Tested - Non-Client CCs Only",
 //       "Not Tested - Blank Screen",
-//       "Not Tested - Incorrect phone number"
+//       "Not Tested - Incorrect phone number",
 //     ],
 //     idVerificationRequired: ["Yes", "No", "N/A"],
 //     bypassIdVerification: ["Yes", "No", "N/A"],
 //     violationTestedProduct: ["Yes", "No", "N/A"],
 //     merchantName: ["Yes", "No", "N/A"],
-//     logGenerated: ["Yes", "No", "N/A"]
+//     logGenerated: ["Yes", "No", "N/A"],
 //   }
 
+//   const handleExpiryDateChange = (value) => {
+//     // Remove any non-digit characters
+//     let cleaned = value.replace(/\D/g, "")
 
+//     // Add slash after 2 digits
+//     if (cleaned.length >= 2) {
+//       cleaned = cleaned.substring(0, 2) + "/" + cleaned.substring(2, 4)
+//     }
+
+//     // Limit to MM/YY format
+//     if (cleaned.length > 5) {
+//       cleaned = cleaned.substring(0, 5)
+//     }
+
+//     handleInputChange("expiryDate", cleaned)
+//   }
+
+//   useEffect(() => {
+//     fetchRecordData()
+//   }, [recordId])
+
+//   const fetchRecordData = async () => {
+//     try {
+//       setLoading(true)
+//       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record/${recordId}`)
+//       if (!response.ok) {
+//         throw new Error(`HTTP error! status: ${response.status}`)
+//       }
+//       const result = await response.json()
+//       if (result?.data && result.data.length > 0) {
+//         const record = result.data[0]
+
+//         // Map database fields to form fields
+//         setFormData({
+//           caseNo: record.case_no || "",
+//           testSuccessful: record.test_successful || "",
+//           cardNo: record.card_no || "",
+//           cardCountry: record.card_country || "",
+//           expiryDate: record.expiry_date ? formatExpiryDate(record.expiry_date) : "",
+//           cvv: record.cvv || "",
+//           email: record.email || "",
+//           testedUrlHomepage: record.tested_url_homepage || "",
+//           testedUrl: record.tested_url || "",
+//           testedOnDate: record.tested_on_date ? record.tested_on_date.split("T")[0] : "",
+//           testedAmount: record.tested_amount || "",
+//           testedCurrency: record.tested_currency || "INR",
+//           billingAddress: record.billing_address || "",
+//           billingPhoneNumber: record.billing_phone_number || "",
+//           billingName: record.billing_name || "",
+//           declinedMessage: record.declined_message || "",
+//           comments: record.comments || "",
+//           notTestedBreakup: record.not_tested_breakup || "",
+//           idVerificationRequired: record.id_verification_required || "",
+//           bypassIdVerification: record.bypass_id_verification || "",
+//           violationTestedProduct: record.violation_tested_product || "",
+//           testedProduct: record.tested_product || "",
+//           merchantName: record.merchant_name || "",
+//           logGenerated: record.log_generated || "",
+//         })
+//         setError(null)
+//       } else {
+//         setError("Record not found")
+//       }
+//     } catch (err) {
+//       console.error("Error fetching record:", err)
+//       setError(`Failed to load record: ${err.message}`)
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+
+//   const formatExpiryDate = (dateString) => {
+//     if (!dateString) return ""
+//     const date = new Date(dateString)
+//     const month = String(date.getMonth() + 1).padStart(2, "0")
+//     const year = String(date.getFullYear()).slice(-2)
+//     return `${month}/${year}`
+//   }
 
 //   const handleInputChange = (field, value) => {
 //     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -97,106 +158,162 @@
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault()
-//     console.log("🚀 Workstream 2 Form submission started...")
-//     console.log("📝 Form data:", formData)
+//     console.log("🚀 Workstream 2 Edit Form submission started...")
 //     setIsSubmitting(true)
 
 //     try {
-//       // Create FormData for submission
-//       const submitData = new FormData()
-
-//       // ===== WORKSTREAM 2 FIELDS =====
-//       submitData.append("case_no", formData.caseNo || "")
-//       submitData.append("test_successful", formData.testSuccessful || "")
-//       submitData.append("card_no", formData.cardNo || "")
-//       submitData.append("card_country", formData.cardCountry || "")
-//       submitData.append("expiry_date", formData.expiryDate || "")
-//       submitData.append("cvv", formData.cvv || "")
-//       submitData.append("email", formData.email || "")
-//       submitData.append("tested_url_homepage", formData.testedUrlHomepage || "")
-//       submitData.append("tested_url", formData.testedUrl || "")
-//       submitData.append("tested_on_date", formData.testedOnDate || "")
-//       submitData.append("tested_amount", formData.testedAmount || "")
-//       submitData.append("tested_currency", formData.testedCurrency || "")
-//       submitData.append("billing_address", formData.billingAddress || "")
-//       submitData.append("billing_phone_number", formData.billingPhoneNumber || "")
-//       submitData.append("billing_name", formData.billingName || "")
-//       submitData.append("declined_message", formData.declinedMessage || "")
-//       submitData.append("comments", formData.comments || "")
-//       submitData.append("not_tested_breakup", formData.notTestedBreakup || "")
-//       submitData.append("id_verification_required", formData.idVerificationRequired || "")
-//       submitData.append("bypass_id_verification", formData.bypassIdVerification || "")
-//       submitData.append("violation_tested_product", formData.violationTestedProduct || "")
-//       submitData.append("tested_product", formData.testedProduct || "")
-//       submitData.append("merchant_name", formData.merchantName || "")
-//       submitData.append("log_generated", formData.logGenerated || "")
-
-//       // Debug: Log all FormData entries
-//       console.log("📤 FormData contents:")
-//       for (const [key, value] of submitData.entries()) {
-//         console.log(`  ${key}:`, value)
+//       // Create payload with ALL 56 fields
+//       const submitData = {
+//         // === 24 FORM FIELDS (with actual data) ===
+//         test_successful: formData.testSuccessful || "",
+//         card_no: formData.cardNo || "",
+//         card_country: formData.cardCountry || "",
+//         expiry_date: formData.expiryDate || "",
+//         cvv: formData.cvv || "",
+//         email: formData.email || "",
+//         tested_url_homepage: formData.testedUrlHomepage || "",
+//         tested_url: formData.testedUrl || "",
+//         tested_on_date: formData.testedOnDate || "",
+//         tested_amount: formData.testedAmount || "",
+//         tested_currency: formData.testedCurrency || "",
+//         billing_address: formData.billingAddress || "",
+//         billing_phone_number: formData.billingPhoneNumber || "",
+//         billing_name: formData.billingName || "",
+//         declined_message: formData.declinedMessage || "",
+//         not_tested_breakup: formData.notTestedBreakup || "",
+//         comments: formData.comments || "",
+//         id_verification_required: formData.idVerificationRequired || "",
+//         bypass_id_verification: formData.bypassIdVerification || "",
+//         violation_tested_product: formData.violationTestedProduct || "",
+//         tested_product: formData.testedProduct || "",
+//         merchant_name: formData.merchantName || "",
+//         log_generated: formData.logGenerated || "",
+//         // === 30 ADDITIONAL FIELDS (preserve existing values or set to null) ===
+//         transaction_gmt_date: null,
+//         account_number_masked: null,
+//         acquiring_identifier: null,
+//         acquiring_user_bid: null,
+//         acquirer_name: null,
+//         acquiring_identifier_region: null,
+//         acquirer_region: null,
+//         acquiring_identifier_legal_country: null,
+//         acquirer_country: null,
+//         merchant_name_acceptor: null,
+//         merchant_city: null,
+//         merchant_state_code: null,
+//         merchant_state: null,
+//         merchant_country_code: null,
+//         merchant_country: null,
+//         merchant_category_code: null,
+//         enriched_merchant_category: null,
+//         card_acceptor_id: null,
+//         card_acceptor_terminal_id: null,
+//         pos_entry_mode: null,
+//         enriched_pos_entry_mode: null,
+//         pos_condition_code: null,
+//         pos_condition: null,
+//         transaction_identifier: null,
+//         transaction_currency_code: null,
+//         eci_moto_group_code: null,
+//         metrics: null,
+//         auth_transaction_count: null,
+//         transaction_amount_usd: null,
+//         auth_transaction_amount: null,
 //       }
 
-//       console.log("🌐 Making API call to: ${import.meta.env.VITE_API_BASE_URL}/api/workstream2")
-//       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/workstream2`, submitData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
+//       console.log("📤 Sending updated data to API:", submitData)
+
+//       const response = await axios.put(
+//         `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record/${recordId}`,
+//         submitData,
+//         {
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
 //         },
-//       })
+//       )
 
 //       console.log("✅ API Response:", response.data)
-//       alert("✅ Workstream 2 form submitted successfully!")
 
-//       // Reset form
-//       setFormData({
-//         caseNo: "",
-//         testSuccessful: "",
-//         cardNo: "",
-//         cardCountry: "",
-//         expiryDate: "",
-//         cvv: "",
-//         email: "",
-//         testedUrlHomepage: "",
-//         testedUrl: "",
-//         testedOnDate: "",
-//         testedAmount: "",
-//         testedCurrency: "USD",
-//         billingAddress: "",
-//         billingPhoneNumber: "",
-//         billingName: "",
-//         declinedMessage: "",
-//         comments: "",
-//         notTestedBreakup: "",
-//         idVerificationRequired: "",
-//         bypassIdVerification: "",
-//         violationTestedProduct: "",
-//         testedProduct: "",
-//         merchantName: "",
-//         logGenerated: "",
-//       })
+//       // Handle the response
+//       if (response.data.success || response.status === 200) {
+//         alert(`✅ Workstream 2 record updated successfully!`)
+
+//         if (onSave) {
+//           onSave(response.data)
+//         }
+
+//         onBack()
+//       }
 //     } catch (error) {
-//       console.error("❌ Form submission error:", error)
-//       console.error("❌ Error details:", {
-//         message: error.message,
-//         response: error.response?.data,
-//         status: error.response?.status,
-//         statusText: error.response?.statusText,
-//       })
+//       console.error("❌ Form update error:", error)
 //       const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred"
-//       alert(`❌ Error submitting form: ${errorMessage}`)
+//       alert(`❌ Error updating record: ${errorMessage}`)
 //     } finally {
 //       setIsSubmitting(false)
 //     }
 //   }
 
+//   if (loading) {
+//     return (
+//       <div className="form-container">
+//         <div className="form-content">
+//           <div style={{ padding: "40px", textAlign: "center", color: "#6b7280" }}>Loading record data...</div>
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   if (error) {
+//     return (
+//       <div className="form-container">
+//         <div className="form-content">
+//           <div style={{ padding: "40px", textAlign: "center", color: "#dc2626" }}>{error}</div>
+//           <button
+//             onClick={onBack}
+//             style={{
+//               display: "flex",
+//               alignItems: "center",
+//               gap: "8px",
+//               background: "transparent",
+//               border: "none",
+//               color: "#6b7280",
+//               cursor: "pointer",
+//               fontSize: "14px",
+//               padding: "8px 0",
+//             }}
+//           >
+//             ← Back to List
+//           </button>
+//         </div>
+//       </div>
+//     )
+//   }
+
 //   return (
 //     <div className="form-container">
-//       {/* Workstream Tabs */}
-  
-
 //       {/* Main Form */}
 //       <div className="form-content">
-//         <h2 className="form-title">Workstream 02 - Payment Testing Form</h2>
+//         <button
+//           onClick={onBack}
+//           style={{
+//             display: "flex",
+//             alignItems: "center",
+//             gap: "8px",
+//             background: "transparent",
+//             border: "none",
+//             color: "#6b7280",
+//             cursor: "pointer",
+//             fontSize: "14px",
+//             marginBottom: "16px",
+//             padding: "8px 0",
+//           }}
+//         >
+//           ← Back to Workstream 2
+//         </button>
+
+//         <h2 className="form-title">Edit Workstream 02 - Payment Testing Form</h2>
+//         <p style={{ color: "#6b7280", fontSize: "14px", marginBottom: "24px" }}>Case No: {formData.caseNo}</p>
 
 //         <form onSubmit={handleSubmit} className="reviewer-form">
 //           {/* First Row - Case Info */}
@@ -208,8 +325,8 @@
 //                 id="caseNo"
 //                 placeholder="Enter unique case number"
 //                 value={formData.caseNo}
-//                 onChange={(e) => handleInputChange("caseNo", e.target.value)}
-//                 required
+//                 readOnly
+//                 style={{ backgroundColor: "#f9fafb" }}
 //               />
 //             </div>
 //             <div className="form-group">
@@ -252,8 +369,6 @@
 //             </div>
 //           </div>
 
-//           {/* Card Information Section */}
-        
 //           <div className="form-row">
 //             <div className="form-group">
 //               <label htmlFor="cardNo">Card No</label>
@@ -305,8 +420,6 @@
 //             </div>
 //           </div>
 
-//           {/* Contact & URL Information */}
-       
 //           <div className="form-row">
 //             <div className="form-group">
 //               <label htmlFor="email">Email</label>
@@ -352,8 +465,6 @@
 //             </div>
 //           </div>
 
-//           {/* Transaction Information */}
-        
 //           <div className="form-row">
 //             <div className="form-group">
 //               <label htmlFor="testedAmount">Tested Amount</label>
@@ -390,15 +501,13 @@
 //                 )}
 //               </select>
 //               {currenciesError && (
-//                 <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+//                 <div style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>
 //                   Failed to load currencies. Using fallback list.
 //                 </div>
 //               )}
 //             </div>
 //           </div>
 
-//           {/* Billing Information */}
-        
 //           <div className="form-group full-width">
 //             <label htmlFor="billingAddress">Billing Address</label>
 //             <textarea
@@ -442,8 +551,6 @@
 //             </div>
 //           </div>
 
-//           {/* Test Results & Analysis */}
-        
 //           <div className="form-row">
 //             <div className="form-group">
 //               <label htmlFor="declinedMessage">Declined Message</label>
@@ -496,8 +603,6 @@
 //             </select>
 //           </div>
 
-//           {/* Verification & Compliance */}
-        
 //           <div className="form-row">
 //             <div className="form-group">
 //               <label htmlFor="idVerificationRequired">ID Verification Required</label>
@@ -597,7 +702,7 @@
 
 //           {/* Submit Button */}
 //           <button type="submit" className="submit-button" disabled={isSubmitting}>
-//             {isSubmitting ? "Submitting..." : "Submit Payment Test Form"}
+//             {isSubmitting ? "Updating..." : "Update Payment Test Form"}
 //           </button>
 //         </form>
 //       </div>
@@ -609,34 +714,16 @@
 
 
 
+
 "use client"
 
 import { useState, useEffect } from "react"
 import axios from "axios"
-import "../styles/Form.css"
-import { useCurrencies } from '../hooks/useCurrencies'
-import { getCurrencyDisplayName } from '../utils/currencyUtils'
+import "../styles/Form.css" // Assuming this CSS file exists for styling
+import { useCurrencies } from "../hooks/useCurrencies" // Assuming this hook exists
+import { getCurrencyDisplayName } from "../utils/currencyUtils" // Assuming this utility exists
 
-export default function Workstream2Form() {
-  const [activeWorkstream, setActiveWorkstream] = useState("02")
-
-  const handleExpiryDateChange = (value) => {
-    // Remove any non-digit characters
-    let cleaned = value.replace(/\D/g, '')
-    
-    // Add slash after 2 digits
-    if (cleaned.length >= 2) {
-      cleaned = cleaned.substring(0, 2) + '/' + cleaned.substring(2, 4)
-    }
-    
-    // Limit to MM/YY format
-    if (cleaned.length > 5) {
-      cleaned = cleaned.substring(0, 5)
-    }
-    
-    handleInputChange("expiryDate", cleaned)
-  }
-
+export default function EditWorkstream2Form({ recordId, onBack, onSave }) {
   const [formData, setFormData] = useState({
     // ===== WORKSTREAM 2 SPECIFIC FIELDS =====
     caseNo: "", // Case No. (Number - unique id)
@@ -665,13 +752,15 @@ export default function Workstream2Form() {
     logGenerated: "", // Log generated Y/N (dropdown) - Now with N/A
   })
 
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { currencies, loading: currenciesLoading, error: currenciesError } = useCurrencies()
 
   // Updated dropdown options for Workstream 2 - All now have Yes/No/N/A
   const dropdownOptions = {
     testedCurrency: currencies,
-    comments: ["Yes","No","NA"],
+    comments: ["Yes", "No", "NA"],
     notTestedBreakup: [
       "Not Tested breakup",
       "Not Tested - CC option unavailable",
@@ -686,30 +775,111 @@ export default function Workstream2Form() {
       "Not Tested - Not Reportable",
       "Not Tested - Non-Client CCs Only",
       "Not Tested - Blank Screen",
-      "Not Tested - Incorrect phone number"
+      "Not Tested - Incorrect phone number",
     ],
     idVerificationRequired: ["Yes", "No", "N/A"],
     bypassIdVerification: ["Yes", "No", "N/A"],
     violationTestedProduct: ["Yes", "No", "N/A"],
     merchantName: ["Yes", "No", "N/A"],
-    logGenerated: ["Yes", "No", "N/A"]
+    logGenerated: ["Yes", "No", "N/A"],
+  }
+
+  const handleExpiryDateChange = (value) => {
+    // Remove any non-digit characters
+    let cleaned = value.replace(/\D/g, "")
+
+    // Add slash after 2 digits
+    if (cleaned.length >= 2) {
+      cleaned = cleaned.substring(0, 2) + "/" + cleaned.substring(2, 4)
+    }
+
+    // Limit to MM/YY format
+    if (cleaned.length > 5) {
+      cleaned = cleaned.substring(0, 5)
+    }
+
+    handleInputChange("expiryDate", cleaned)
+  }
+
+  useEffect(() => {
+    fetchRecordData()
+  }, [recordId])
+
+  const fetchRecordData = async () => {
+    try {
+      setLoading(true)
+
+      // Fetch record by ID using the new endpoint
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record-by-id/${recordId}`)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const result = await response.json()
+
+      if (result?.data && result.data.length > 0) {
+        const record = result.data[0]
+
+        // Map database fields to form fields
+        setFormData({
+          caseNo: record.case_no || "",
+          testSuccessful: record.test_successful || "",
+          cardNo: record.card_no || "",
+          cardCountry: record.card_country || "",
+          expiryDate: record.expiry_date ? formatExpiryDate(record.expiry_date) : "",
+          cvv: record.cvv || "",
+          email: record.email || "",
+          testedUrlHomepage: record.tested_url_homepage || "",
+          testedUrl: record.tested_url || "",
+          testedOnDate: record.tested_on_date ? record.tested_on_date.split("T")[0] : "",
+          testedAmount: record.tested_amount || "",
+          testedCurrency: record.tested_currency || "INR",
+          billingAddress: record.billing_address || "",
+          billingPhoneNumber: record.billing_phone_number || "",
+          billingName: record.billing_name || "",
+          declinedMessage: record.declined_message || "",
+          comments: record.comments || "",
+          notTestedBreakup: record.not_tested_breakup || "",
+          idVerificationRequired: record.id_verification_required || "",
+          bypassIdVerification: record.bypass_id_verification || "",
+          violationTestedProduct: record.violation_tested_product || "",
+          testedProduct: record.tested_product || "",
+          merchantName: record.merchant_name || "",
+          logGenerated: record.log_generated || "",
+        })
+        setError(null)
+      } else {
+        setError("Record not found")
+      }
+    } catch (err) {
+      console.error("Error fetching record:", err)
+      setError(`Failed to load record: ${err.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const formatExpiryDate = (dateString) => {
+    if (!dateString) return ""
+    const date = new Date(dateString)
+    const month = String(date.getMonth() + 1).padStart(2, "0")
+    const year = String(date.getFullYear()).slice(-2)
+    return `${month}/${year}`
   }
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  // === UPDATE THE FORM SUBMISSION ===
   const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log("🚀 Workstream 2 Form submission started...")
+    console.log("🚀 Workstream 2 Edit Form submission started...")
+    console.log("📝 Using ID for update:", recordId)
     setIsSubmitting(true)
 
     try {
       // Create payload with ALL 56 fields
       const submitData = {
         // === 24 FORM FIELDS (with actual data) ===
-        case_no: formData.caseNo || "",
         test_successful: formData.testSuccessful || "",
         card_no: formData.cardNo || "",
         card_country: formData.cardCountry || "",
@@ -733,8 +903,7 @@ export default function Workstream2Form() {
         tested_product: formData.testedProduct || "",
         merchant_name: formData.merchantName || "",
         log_generated: formData.logGenerated || "",
-
-        // === 30 ADDITIONAL FIELDS (empty for now, ready for future functionality) ===
+        // === 30 ADDITIONAL FIELDS (preserve existing values or set to null) ===
         transaction_gmt_date: null,
         account_number_masked: null,
         acquiring_identifier: null,
@@ -767,66 +936,102 @@ export default function Workstream2Form() {
         auth_transaction_amount: null,
       }
 
-      console.log("📤 Sending all 56 fields to API:", submitData)
+      console.log("📤 Sending updated data to API using ID:", recordId)
 
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/workstream2`, submitData, {
-        headers: {
-          "Content-Type": "application/json",
+      // Update record by ID using the new endpoint
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record-by-id/${recordId}`,
+        submitData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      })
+      )
 
       console.log("✅ API Response:", response.data)
-      
-      // Handle the new response structure
-      if (response.data.success) {
-        alert(`✅ Workstream 2 form submitted successfully! 
-        📊 Fields: ${response.data.field_summary?.total_fields || 56} total
-        ✅ Populated: ${response.data.field_summary?.populated_fields || 26}
-        ⭕ Empty: ${response.data.field_summary?.empty_fields || 30}`)
-      }
 
-      // Reset form with all fields
-      setFormData({
-        caseNo: "",
-        testSuccessful: "",
-        cardNo: "",
-        cardCountry: "",
-        expiryDate: "",
-        cvv: "",
-        email: "",
-        testedUrlHomepage: "",
-        testedUrl: "",
-        testedOnDate: "",
-        testedAmount: "",
-        testedCurrency: "INR",
-        billingAddress: "",
-        billingPhoneNumber: "",
-        billingName: "",
-        declinedMessage: "",
-        comments: "",
-        notTestedBreakup: "",
-        idVerificationRequired: "",
-        bypassIdVerification: "",
-        violationTestedProduct: "",
-        testedProduct: "",
-        merchantName: "",
-        logGenerated: "",
-      })
+      // Handle the response
+      if (response.data.success || response.status === 200) {
+        alert(`✅ Workstream 2 record updated successfully!`)
+
+        if (onSave) {
+          onSave(response.data)
+        }
+
+        onBack()
+      }
     } catch (error) {
-      console.error("❌ Form submission error:", error)
+      console.error("❌ Form update error:", error)
       const errorMessage = error.response?.data?.message || error.message || "Unknown error occurred"
-      alert(`❌ Error submitting form: ${errorMessage}`)
+      alert(`❌ Error updating record: ${errorMessage}`)
     } finally {
       setIsSubmitting(false)
     }
   }
 
+  if (loading) {
+    return (
+      <div className="form-container">
+        <div className="form-content">
+          <div style={{ padding: "40px", textAlign: "center", color: "#6b7280" }}>Loading record data...</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="form-container">
+        <div className="form-content">
+          <div style={{ padding: "40px", textAlign: "center", color: "#dc2626" }}>{error}</div>
+          <button
+            onClick={onBack}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              background: "transparent",
+              border: "none",
+              color: "#6b7280",
+              cursor: "pointer",
+              fontSize: "14px",
+              padding: "8px 0",
+            }}
+          >
+            ← Back to List
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
-   
     <div className="form-container">
       {/* Main Form */}
       <div className="form-content">
-        <h2 className="form-title">Workstream 02 - Payment Testing Form</h2>
+        <button
+          onClick={onBack}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            background: "transparent",
+            border: "none",
+            color: "#6b7280",
+            cursor: "pointer",
+            fontSize: "14px",
+            marginBottom: "16px",
+            padding: "8px 0",
+          }}
+        >
+          ← Back to Workstream 2
+        </button>
+
+        <h2 className="form-title">Edit Workstream 02 - Payment Testing Form</h2>
+        <p style={{ color: "#6b7280", fontSize: "14px", marginBottom: "24px" }}>
+          Case No: {formData.caseNo} (ID: {recordId})
+        </p>
 
         <form onSubmit={handleSubmit} className="reviewer-form">
           {/* First Row - Case Info */}
@@ -838,8 +1043,8 @@ export default function Workstream2Form() {
                 id="caseNo"
                 placeholder="Enter unique case number"
                 value={formData.caseNo}
-                onChange={(e) => handleInputChange("caseNo", e.target.value)}
-                required
+                readOnly
+                style={{ backgroundColor: "#f9fafb" }}
               />
             </div>
             <div className="form-group">
@@ -1014,7 +1219,7 @@ export default function Workstream2Form() {
                 )}
               </select>
               {currenciesError && (
-                <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                <div style={{ color: "#dc2626", fontSize: "12px", marginTop: "4px" }}>
                   Failed to load currencies. Using fallback list.
                 </div>
               )}
@@ -1215,10 +1420,11 @@ export default function Workstream2Form() {
 
           {/* Submit Button */}
           <button type="submit" className="submit-button" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit Payment Test Form"}
+            {isSubmitting ? "Updating..." : "Update Payment Test Form"}
           </button>
         </form>
       </div>
     </div>
   )
 }
+

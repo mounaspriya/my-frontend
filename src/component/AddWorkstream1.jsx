@@ -1907,7 +1907,7 @@ export default function ReviewerForm() {
   // Website URL autocomplete functionality
   const fetchSuggestions = async (searchTerm) => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/website-sources?search=${searchTerm}`)
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/website-sources?search=${searchTerm}`)
       setSuggestions(response.data)
       setShowSuggestions(true)
       const exactMatch = response.data.find((item) => item.website_url.toLowerCase() === searchTerm.toLowerCase())
