@@ -1452,7 +1452,7 @@ export default function DashboardView() {
   useEffect(() => {
     const fetchQuickAccessData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/open/workstream-list")
+        const response = await fetch( `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream-list`)
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
         }

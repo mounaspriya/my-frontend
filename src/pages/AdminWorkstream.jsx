@@ -1200,7 +1200,7 @@ const WorkstreamPage = () => {
   // Fetch dynamic workstreams
   const fetchWorkstreams = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/open/workstream-list", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream-list`, {
         withCredentials: true,
       })
       if (res.data.success) {
@@ -1316,7 +1316,7 @@ const WorkstreamPage = () => {
     }
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/open/workstream-list",
+        `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream-list`,
         {
           name: newWorkstreamName.trim(),
         },
