@@ -859,7 +859,7 @@ const RegisterPage = () => {
                 style={styles.input}
                 required
               />
-              {/* <select
+               <select
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
@@ -868,7 +868,7 @@ const RegisterPage = () => {
               >
                 <option value="Viewer">Viewer</option>
                 <option value="Admin">Admin</option>
-              </select> */}
+              </select> 
               <input
                 type="password"
                 name="password"
