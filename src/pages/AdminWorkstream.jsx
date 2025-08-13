@@ -1224,18 +1224,18 @@ const WorkstreamPage = () => {
         let configKey = "" // Key to select column configuration
 
         if (selectedWorkstream === "workstream1") {
-          endpoint = "http://localhost:5000/api/open/workstream"
+          endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream`
           configKey = "workstream1"
         } else {
           // Find the selected dynamic workstream by its ID
           const ws = dynamicWorkstreams.find((w) => w.id === selectedWorkstream)
           if (ws) {
             if (ws.name === "Workstream 2") {
-              endpoint = "http://localhost:5000/api/open/workstream2" // Specific endpoint for Workstream 2
+              endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2` // Specific endpoint for Workstream 2
               configKey = "workstream2"
             } else {
               // For other dynamic workstreams, use generic endpoint and default to workstream1 columns
-              endpoint = `http://localhost:5000/api/open/workstream/${selectedWorkstream}`
+              endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream/${selectedWorkstream}`
               configKey = "workstream1" // Fallback to generic columns
             }
           } else {
@@ -1284,12 +1284,12 @@ const WorkstreamPage = () => {
     try {
       let endpoint = ""
       if (deleteWorkstreamType === "workstream1") {
-        endpoint = `http://localhost:5000/api/open/workstream/${deleteId}`
+        endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream/${deleteId}`
       } else if (deleteWorkstreamType === "workstream2") {
-        endpoint = `http://localhost:5000/api/open/workstream2-record-by-id/${deleteId}` // Use ID-based delete for Workstream 2
+        endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record-by-id/${deleteId}` // Use ID-based delete for Workstream 2
       } else {
         // Fallback for other dynamic workstreams if needed
-        endpoint = `http://localhost:5000/api/open/workstream/${deleteId}`
+        endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream/${deleteId}`
       }
 
       const res = await axios.delete(endpoint, { withCredentials: true })
