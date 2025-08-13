@@ -242,7 +242,7 @@ export default function DashboardView() {
   useEffect(() => {
     const fetchDynamicWorkstreams = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/open/workstream-list", {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/workstream-list`, {
           withCredentials: true,
         })
         if (res.data.success) {
