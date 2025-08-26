@@ -260,7 +260,13 @@ const WorkstreamDashboard = () => {
           <div style={styles.headerLeft}>
             {/* Logo */}
             <div style={styles.logo}>
-              <img src="/gBitLogo.png" alt="Gbit Logo" style={styles.logoImage} />
+                         <img
+        src="/gBitLogo.png"
+        alt="Gbit Logo"
+        style={{ ...styles.logoImage, cursor: "pointer" }}
+        onClick={() => navigate("/dashboardview")}
+      />
+              {/* <img src="/gBitLogo.png" alt="Gbit Logo" style={styles.logoImage} /> */}
             </div>
             {/* Navigation */}
             <nav style={styles.nav}>

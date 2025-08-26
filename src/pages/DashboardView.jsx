@@ -9,6 +9,8 @@ import WorkstreamDetail1 from "./WorkstreamDetail1"
 import WorkstreamDetail2 from "./WorkstreamDetail2"
 import WorkstreamDetail3 from "./WorkstreamDetails3"
 import WorkstreamDetail4 from "./WorkstreamDetails4"
+import { Link } from "react-router-dom"
+
 
 const styles = {
   container: {
@@ -376,7 +378,13 @@ export default function DashboardView() {
         <div style={styles.headerContent}>
           <div style={styles.headerLeft}>
             <div style={styles.logo}>
-              <img src="/gBitLogo.png" alt="Gbit Logo" style={styles.logoImage} />
+                 <img
+        src="/gBitLogo.png"
+        alt="Gbit Logo"
+        style={{ ...styles.logoImage, cursor: "pointer" }}
+        onClick={() => navigate("/dashboardview")}
+      />
+              {/* <img src="/gBitLogo.png" alt="Gbit Logo" style={styles.logoImage} /> */}
             </div>
             <nav style={styles.nav}>
               {console.log("currentPath:", currentPath)}
