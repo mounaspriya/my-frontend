@@ -2280,10 +2280,21 @@ export default function EditReviewerForm({ recordId, onBack, onSave }) {
             // Parse images if it's a string, otherwise use as-is
             const parsedImages = typeof record.images === "string" ? JSON.parse(record.images) : record.images
 
+            const getFullImageUrl = (url) => {
+              if (!url) return "/placeholder.svg"
+              // If URL is already absolute, return as-is
+              if (url.startsWith("http://") || url.startsWith("https://")) {
+                return url
+              }
+              // Construct full URL using the same domain as the API
+              const baseUrl = window.location.origin.replace("localhost:3000", "idata.zaaprdigital.com")
+              return url.startsWith("/") ? `${baseUrl}${url}` : `${baseUrl}/${url}`
+            }
+
             // Handle both array and single object cases
             if (Array.isArray(parsedImages)) {
               existingImages = parsedImages.map((img) => ({
-                url: img.url || img,
+                url: getFullImageUrl(img.url || img),
                 originalname: img.originalname || img.owner_name || "Image",
                 size: img.size || 0,
               }))
@@ -2291,14 +2302,14 @@ export default function EditReviewerForm({ recordId, onBack, onSave }) {
               // Single image object
               existingImages = [
                 {
-                  url: parsedImages.url,
+                  url: getFullImageUrl(parsedImages.url),
                   originalname: parsedImages.originalname || parsedImages.owner_name || "Image",
                   size: parsedImages.size || 0,
                 },
               ]
             }
 
-            console.log("🖼️ Processed existing images:", existingImages)
+            console.log("🖼️ Processed existing images with full URLs:", existingImages)
           } catch (e) {
             console.error("Error parsing existing images:", e)
             existingImages = []
@@ -3100,7 +3111,8 @@ export default function EditReviewerForm({ recordId, onBack, onSave }) {
                     alt={`Existing ${index + 1}`}
                     className="preview-image"
                     onError={(e) => {
-                      console.error("Failed to load image:", image.url)
+                      console.error("❌ Failed to load image:", image.url)
+                      console.log("🔍 Attempting to load from:", e.target.src)
                       e.target.src = "/placeholder.svg"
                     }}
                     onLoad={() => {
@@ -3214,4 +3226,5 @@ export default function EditReviewerForm({ recordId, onBack, onSave }) {
     </div>
   )
 }
+
 
