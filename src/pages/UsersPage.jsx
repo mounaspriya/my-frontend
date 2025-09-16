@@ -4,6 +4,8 @@ import Topbar from "../component/TopBar";
 import "../styles/UsersPage.css";
 import "../styles/Layout.css";
 import axios from "axios";
+import { useAuth } from "../contexts/AuthContext"; // ✅ import useAuth
+import { ChevronDown, LogOut, User } from "lucide-react"; // icons
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
@@ -17,7 +19,13 @@ const UsersPage = () => {
     password: "",
     isSuperAdmin: false,
   });
+  const { user, logout } = useAuth(); // ✅ get user + logout
+  const [showDropdown, setShowDropdown] = useState(false);
 
+  const handleLogout = () => {
+    logout();
+    setShowDropdown(false);
+  };
   const fetchUsers = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/open/users`);
@@ -126,9 +134,37 @@ const handleCreateUser = async () => {
     <div className="admin-dashboard-container">
       <Sidebar />
       <div className="main-content">
-        <Topbar onSearch={setSearchTerm}/>
+      <header className="topbar">
+             <h2>User List</h2>
+     
+                 {/* Profile Section */}
+                 <div className="profile">
+                   <button
+                     className="profile-btn"
+                     onClick={() => setShowDropdown(!showDropdown)}
+                   >
+                     <div className="avatar-circle">
+                       {user?.name ? user.name[0].toUpperCase() : "A"}
+                     </div>
+                     <span>{user?.email || "admin@example.com"}</span>
+                     <ChevronDown size={16} />
+                   </button>
+     
+                   {showDropdown && (
+                     <div className="profile-dropdown">
+                       <div className="profile-info">
+                         <p className="name">{user?.name || "Admin User"}</p>
+                         <p className="email">{user?.email || "admin@example.com"}</p>
+                       </div>
+                       <button className="logout-btn" onClick={handleLogout}>
+                         <LogOut size={16} /> Logout
+                       </button>
+                     </div>
+                   )}
+                 </div>
+               </header>
         <div className="users-page">
-          <h2>User List</h2>
+       
 
           {/* Create Button */}
           <div style={{ marginBottom: "10px", display: "flex", gap: "10px" }}>
@@ -379,6 +415,68 @@ const handleCreateUser = async () => {
   .close-btn:hover {
     color: #e11d48;
   }
+     .profile {
+          position: relative;
+        }
+        .profile-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          cursor: pointer;
+        }
+        .avatar-circle {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: #2563eb;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+        }
+        .profile-dropdown {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          margin-top: 0.5rem;
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          min-width: 200px;
+          z-index: 50;
+        }
+        .profile-info {
+          padding: 0.75rem;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        .profile-info .name {
+          font-weight: 600;
+          font-size: 0.9rem;
+        }
+        .profile-info .email {
+          font-size: 0.8rem;
+          color: #6b7280;
+        }
+        .logout-btn {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1rem;
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #dc2626;
+        }
+        .logout-btn:hover {
+          background: #fef2f2;
+        }
 `}</style>
 
     </div>

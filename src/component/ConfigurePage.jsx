@@ -1310,6 +1310,9 @@ import Topbar from "../component/TopBar"
 import axios from "axios"
 import "../styles/Layout.css"
 import FormBuilder from "../component/FormBuilder"
+import { useAuth } from "../contexts/AuthContext"; // ✅ import useAuth
+import { ChevronDown, LogOut, User } from "lucide-react"; // icons
+
 
 const ConfigurePage = () => {
   const [activeTab, setActiveTab] = useState("workstream1")
@@ -1319,6 +1322,13 @@ const ConfigurePage = () => {
   const [showAddField, setShowAddField] = useState(false)
   const [editingFieldId, setEditingFieldId] = useState(null)
   const [editedLabel, setEditedLabel] = useState("")
+    const { user, logout } = useAuth(); // ✅ get user + logout
+    const [showDropdown, setShowDropdown] = useState(false);
+  
+    const handleLogout = () => {
+      logout();
+      setShowDropdown(false);
+    };
 
   useEffect(() => {
     if (activeTab !== "workstream3") {
@@ -1461,13 +1471,39 @@ const ConfigurePage = () => {
     <div className="admin-dashboard-container">
       <Sidebar />
       <div className="main-content">
-        <Topbar />
+           <header className="topbar">
+               <h2 style={{ textAlign: "center" }}>Configure Workstreams</h2>
+          <div className="profile">
+                      <button
+                        className="profile-btn"
+                        onClick={() => setShowDropdown(!showDropdown)}
+                      >
+                        <div className="avatar-circle">
+                          {user?.name ? user.name[0].toUpperCase() : "A"}
+                        </div>
+                        <span>{user?.email || "admin@example.com"}</span>
+                        <ChevronDown size={16} />
+                      </button>
+        
+                      {showDropdown && (
+                        <div className="profile-dropdown">
+                          <div className="profile-info">
+                            <p className="name">{user?.name || "Admin User"}</p>
+                            <p className="email">{user?.email || "admin@example.com"}</p>
+                          </div>
+                          <button className="logout-btn" onClick={handleLogout}>
+                            <LogOut size={16} /> Logout
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                       </header>
         <div className="page-content">
-          <h2 style={{ textAlign: "center" }}>Configure Workstreams</h2>
+      
 
           {/* Tabs */}
           <div className="tabs">
-            {["workstream1", "workstream2", "workstream3", "workstream4"].map((tab, idx) => (
+            {["workstream1", "workstream2", "workstream3", ].map((tab, idx) => (
               <button key={tab} onClick={() => setActiveTab(tab)} className={activeTab === tab ? "active" : ""}>
                 Workstream {idx + 1}
               </button>
@@ -1671,6 +1707,68 @@ const ConfigurePage = () => {
         }
         .config-table tr:hover {
           background-color: #f9fafb;
+        }
+           .profile {
+          position: relative;
+        }
+        .profile-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          cursor: pointer;
+        }
+        .avatar-circle {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: #2563eb;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+        }
+        .profile-dropdown {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          margin-top: 0.5rem;
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          min-width: 200px;
+          z-index: 50;
+        }
+        .profile-info {
+          padding: 0.75rem;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        .profile-info .name {
+          font-weight: 600;
+          font-size: 0.9rem;
+        }
+        .profile-info .email {
+          font-size: 0.8rem;
+          color: #6b7280;
+        }
+        .logout-btn {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1rem;
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #dc2626;
+        }
+        .logout-btn:hover {
+          background: #fef2f2;
         }
       `}</style>
     </div>

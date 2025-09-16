@@ -1732,9 +1732,888 @@
 
 
 
+// "use client"
+
+// import { useState, useEffect } from "react"
+// import Sidebar from "../component/Sidebar"
+// import "../styles/Layout.css"
+// import axios from "axios"
+// import { FiTrash2 } from "react-icons/fi"
+// import * as XLSX from "xlsx"
+
+// const WorkstreamPage = () => {
+//   const [selectedWorkstream, setSelectedWorkstream] = useState("workstream1")
+//   const [data, setData] = useState([])
+//   const [dynamicWorkstreams, setDynamicWorkstreams] = useState([])
+//   const [currentColumns, setCurrentColumns] = useState([])
+
+//   const columnConfigurations = {
+//     workstream1: [
+//       { header: "Users Name", key: "owner_name" },
+//       { header: "Accessibility", key: "accessibility" },
+//       { header: "Comments", key: "comments" },
+//       {
+//         header: "Review Date",
+//         key: "review_date",
+//         render: (item) => (item.review_date ? new Date(item.review_date).toLocaleDateString() : "N/A"),
+//       },
+//     ],
+//     workstream2: [
+//       { header: "Case No.", key: "case_no" },
+//       { header: "Test Successful", key: "test_successful" },
+//       { header: "Card No", key: "card_no" },
+//       { header: "Card Country", key: "card_country" },
+//       { header: "Expiry Date", key: "expiry_date" },
+//       { header: "CVV", key: "cvv" },
+//       { header: "Email", key: "email" },
+//       { header: "Tested URL Homepage", key: "tested_url_homepage" },
+//       { header: "Tested URL", key: "tested_url" },
+//       {
+//         header: "Tested on Date",
+//         key: "tested_on_date",
+//         render: (item) => (item.tested_on_date ? new Date(item.tested_on_date).toLocaleDateString() : "N/A"),
+//       },
+//       { header: "Tested Amount", key: "tested_amount" },
+//       { header: "Tested Currency", key: "tested_currency" },
+//       { header: "Billing Address", key: "billing_address" },
+//       { header: "Billing Phone Number", key: "billing_phone_number" },
+//       { header: "Billing Name", key: "billing_name" },
+//       { header: "Declined Message", key: "declined_message" },
+//       { header: "Comments", key: "comments" },
+//       { header: "Not Tested Breakup", key: "not_tested_breakup" },
+//       { header: "ID Verification Required", key: "id_verification_required" },
+//       { header: "Bypass ID Verification", key: "bypass_id_verification" },
+//       { header: "Violation Tested Product", key: "violation_tested_product" },
+//       { header: "Tested Product", key: "tested_product" },
+//       { header: "Merchant Name", key: "merchant_name" },
+//       { header: "Log Generated Y/N", key: "log_generated" },
+//     ],
+//     workstream3: [
+//       { header: "ID", key: "id" },
+//       { header: "Submission", key: "submission" },
+//       // Additional columns can be added here dynamically
+//     ],
+//   }
+
+//   // Fetch workstream list
+//   const fetchWorkstreams = async () => {
+//     try {
+//       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream-list`, {
+//         withCredentials: true,
+//       })
+//       if (res.data.success) {
+//         setDynamicWorkstreams(res.data.data)
+//       }
+//     } catch (error) {
+//       console.error("Error fetching workstreams:", error)
+//     }
+//   }
+
+//   useEffect(() => {
+//     fetchWorkstreams()
+//   }, [])
+
+//   // Fetch data of selected workstream
+//   useEffect(() => {
+//     const fetchWorkstreamData = async () => {
+//       try {
+//         let endpoint = ""
+//         let configKey = ""
+
+//         if (selectedWorkstream === "workstream1") {
+//           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream`
+//           configKey = "workstream1"
+//         } else if (selectedWorkstream === "workstream2") {
+//           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2`
+//           configKey = "workstream2"
+//         } else if (selectedWorkstream === "workstream3") {
+//           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream3`
+//           configKey = "workstream3"
+//         } else {
+//           // dynamic workstream
+//           const dynamicId = selectedWorkstream.replace("dynamic-", "")
+//           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream/${dynamicId}`
+//           configKey = "dynamic"
+//         }
+
+//         const res = await axios.get(endpoint, { withCredentials: true })
+//         if (res.data.success) {
+//           const fetchedData = res.data.data
+
+//           if (configKey === "dynamic" || configKey === "workstream3") {
+//             const allKeys = new Set()
+//             fetchedData.forEach((item) => {
+//               if (item.submission) {
+//                 Object.keys(item.submission).forEach((k) => allKeys.add(k))
+//               }
+//             })
+
+//             const dynamicColumns = Array.from(allKeys).map((key) => ({
+//               header: key,
+//               key: key,
+//             }))
+
+//             const flattened = fetchedData.map((item) => ({
+//               id: item.id,
+//               ...item.submission,
+//             }))
+
+//             setData(flattened)
+//             setCurrentColumns(dynamicColumns)
+//           } else {
+//             setData(fetchedData)
+//             setCurrentColumns(columnConfigurations[configKey] || [])
+//           }
+//         } else {
+//           setData([])
+//           setCurrentColumns([])
+//         }
+//       } catch (error) {
+//         console.error("Error fetching workstream data:", error)
+//         setData([])
+//         setCurrentColumns([])
+//       }
+//     }
+
+//     if (dynamicWorkstreams.length > 0 || selectedWorkstream === "workstream1") {
+//       fetchWorkstreamData()
+//     }
+//   }, [selectedWorkstream, dynamicWorkstreams])
+
+//   // Delete handler
+//   const handleDelete = async (id, wsType) => {
+//     if (!confirm("Are you sure you want to delete this record?")) return
+
+//     let deleteUrl = ""
+//     if (wsType === "workstream1") {
+//       deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/api/workspace_data/${id}`
+//     } else if (wsType === "workstream2") {
+//       deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record-by-id/${id}`
+//     } else if (wsType === "workstream3") {
+//       deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream3/${id}`
+//     } else if (wsType.startsWith("dynamic-")) {
+//       const dynamicId = wsType.replace("dynamic-", "")
+//       deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream/${dynamicId}/record/${id}`
+//     }
+
+//     try {
+//       const res = await fetch(deleteUrl, { method: "DELETE" })
+//       if (!res.ok) throw new Error("Failed to delete record")
+
+//       setData((prev) => prev.filter((item) => item.id !== id))
+//     } catch (err) {
+//       console.error("Delete error:", err)
+//       alert(err.message)
+//     }
+//   }
+
+//   // Export to Excel
+//   const exportToExcel = () => {
+//     if (data.length === 0) {
+//       alert("No data to export.")
+//       return
+//     }
+//     const worksheet = XLSX.utils.json_to_sheet(data)
+//     const workbook = XLSX.utils.book_new()
+//     const workstreamName = selectedWorkstream
+//     XLSX.utils.book_append_sheet(workbook, worksheet, workstreamName)
+//     XLSX.writeFile(workbook, `${workstreamName}_data.xlsx`)
+//   }
+
+//   return (
+//     <div className="admin-dashboard-container">
+//       <Sidebar />
+//       <div className="main-content">
+//         <div className="page-content">
+//           <h2 style={{ textAlign: "center" }}>Workstreams</h2>
+
+//           {/* Workstream Cards */}
+//           <div className="workstream-cards">
+//             <div
+//               className={`workstream-card ${selectedWorkstream === "workstream1" ? "selected" : ""}`}
+//               onClick={() => setSelectedWorkstream("workstream1")}
+//             >
+//               <h3>Workstream 1</h3>
+//               <p>{selectedWorkstream === "workstream1" ? data.length : "0"} Rows</p>
+//             </div>
+
+//             <div
+//               className={`workstream-card ${selectedWorkstream === "workstream2" ? "selected" : ""}`}
+//               onClick={() => setSelectedWorkstream("workstream2")}
+//             >
+//               <h3>Workstream 2</h3>
+//               <p>{selectedWorkstream === "workstream2" ? data.length : "0"} Rows</p>
+//             </div>
+
+//             <div
+//               className={`workstream-card ${selectedWorkstream === "workstream3" ? "selected" : ""}`}
+//               onClick={() => setSelectedWorkstream("workstream3")}
+//             >
+//               <h3>Workstream 3</h3>
+//               <p>{selectedWorkstream === "workstream3" ? data.length : "0"} Rows</p>
+//             </div>
+
+//             {dynamicWorkstreams
+//               .filter((ws) => ws.name !== "Workstream 1" && ws.name !== "Workstream 2" && ws.name !== "Workstream 3")
+//               .map((ws) => (
+//                 <div
+//                   key={ws.id}
+//                   className={`workstream-card ${selectedWorkstream === `dynamic-${ws.id}` ? "selected" : ""}`}
+//                   onClick={() => setSelectedWorkstream(`dynamic-${ws.id}`)}
+//                 >
+//                   <h3>{ws.name}</h3>
+//                   <p>{selectedWorkstream === `dynamic-${ws.id}` ? data.length : "0"} Rows</p>
+//                 </div>
+//               ))}
+//           </div>
+
+//           {/* Actions */}
+//           <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+//             <button onClick={exportToExcel} disabled={data.length === 0}>
+//               Export
+//             </button>
+//           </div>
+
+//           {/* Data Table */}
+//           <div
+//             className="workstream-table"
+//             style={{
+//               overflowX: "auto",
+//               overflowY: "auto",
+//               maxHeight: "500px",
+//               border: "1px solid #ddd",
+//               marginTop: "20px",
+//             }}
+//           >
+//             <table style={{ minWidth: "1200px" }}>
+//               <thead>
+//                 <tr>
+//                   {currentColumns.map((col) => (
+//                     <th key={col.key}>{col.header}</th>
+//                   ))}
+//                   <th>Action</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {data.length === 0 ? (
+//                   <tr>
+//                     <td colSpan={currentColumns.length + 1} style={{ textAlign: "center" }}>
+//                       No data found
+//                     </td>
+//                   </tr>
+//                 ) : (
+//                   data.map((item) => (
+//                     <tr key={item.id}>
+//                       {currentColumns.map((col) => (
+//                         <td key={`${item.id}-${col.key}`}>
+//                           {col.render
+//                             ? col.render(item)
+//                             : item[col.key] !== undefined && item[col.key] !== null && item[col.key] !== ""
+//                               ? item[col.key]
+//                               : "N/A"}
+//                         </td>
+//                       ))}
+//                       <td>
+//                         <FiTrash2
+//                           onClick={() => handleDelete(item.id, selectedWorkstream)}
+//                           style={{ cursor: "pointer", color: "crimson", fontSize: "18px", marginLeft: "10px" }}
+//                         />
+//                       </td>
+//                     </tr>
+//                   ))
+//                 )}
+//               </tbody>
+//             </table>
+//           </div>
+//           <p style={{ marginTop: "10px" }}>{data.length} users</p>
+//         </div>
+//       </div>
+
+//       <style>{`
+//         .workstream-cards {
+//           display: flex;
+//           gap: 16px;
+//           margin: 20px 0;
+//         }
+//         .workstream-card {
+//           flex: 1;
+//           border: 2px solid #e5e7eb;
+//           border-radius: 12px;
+//           padding: 20px;
+//           text-align: center;
+//           cursor: pointer;
+//           background: #fff;
+//         }
+//         .workstream-card.selected {
+//           border-color: #8b5cf6;
+//           background: #f5f3ff;
+//         }
+//         .workstream-table table {
+//           width: 100%;
+//           border-collapse: collapse;
+//           white-space: nowrap;
+//         }
+//         .workstream-table th, .workstream-table td {
+//           padding: 12px;
+//           border-bottom: 1px solid #ddd;
+//           text-align: left;
+//         }
+//         .workstream-table thead th {
+//           position: sticky;
+//           top: 0;
+//           background: #f9fafb;
+//           z-index: 1;
+//         }
+//       `}</style>
+//     </div>
+//   )
+// }
+
+// export default WorkstreamPage
+
+
+
+
+
+
+
+
+
+
+
+// "use client"
+
+// import { useState, useEffect } from "react"
+// import Sidebar from "../component/Sidebar"
+// import "../styles/Layout.css"
+// import axios from "axios"
+// import { FiTrash2 } from "react-icons/fi"
+// import * as XLSX from "xlsx"
+
+// const WorkstreamPage = () => {
+//   const [selectedWorkstream, setSelectedWorkstream] = useState("workstream1")
+//   const [data, setData] = useState([])
+//   const [dynamicWorkstreams, setDynamicWorkstreams] = useState([])
+//   const [currentColumns, setCurrentColumns] = useState([])
+
+//   const [showModal, setShowModal] = useState(false)
+//   const [showSuccessModal, setShowSuccessModal] = useState(false)
+//   const [newWorkstreamName, setNewWorkstreamName] = useState("")
+//   const [error, setError] = useState("")
+
+//   // column configs
+//   const columnConfigurations = {
+//     workstream1: [
+//       { header: "Users Name", key: "owner_name" },
+//       { header: "Accessibility", key: "accessibility" },
+//       { header: "Comments", key: "comments" },
+//       {
+//         header: "Review Date",
+//         key: "review_date",
+//         render: (item) =>
+//           item.review_date ? new Date(item.review_date).toLocaleDateString() : "N/A",
+//       },
+//     ],
+//     workstream2: [
+//       { header: "Case No.", key: "case_no" },
+//       { header: "Test Successful", key: "test_successful" },
+//       { header: "Card No", key: "card_no" },
+//       { header: "Card Country", key: "card_country" },
+//       { header: "Expiry Date", key: "expiry_date" },
+//       { header: "CVV", key: "cvv" },
+//       { header: "Email", key: "email" },
+//       { header: "Tested URL Homepage", key: "tested_url_homepage" },
+//       { header: "Tested URL", key: "tested_url" },
+//       {
+//         header: "Tested on Date",
+//         key: "tested_on_date",
+//         render: (item) =>
+//           item.tested_on_date ? new Date(item.tested_on_date).toLocaleDateString() : "N/A",
+//       },
+//       { header: "Tested Amount", key: "tested_amount" },
+//       { header: "Tested Currency", key: "tested_currency" },
+//       { header: "Billing Address", key: "billing_address" },
+//       { header: "Billing Phone Number", key: "billing_phone_number" },
+//       { header: "Billing Name", key: "billing_name" },
+//       { header: "Declined Message", key: "declined_message" },
+//       { header: "Comments", key: "comments" },
+//       { header: "Not Tested Breakup", key: "not_tested_breakup" },
+//       { header: "ID Verification Required", key: "id_verification_required" },
+//       { header: "Bypass ID Verification", key: "bypass_id_verification" },
+//       { header: "Violation Tested Product", key: "violation_tested_product" },
+//       { header: "Tested Product", key: "tested_product" },
+//       { header: "Merchant Name", key: "merchant_name" },
+//       { header: "Log Generated Y/N", key: "log_generated" },
+//     ],
+//     workstream3: [
+//       { header: "ID", key: "id" },
+//       { header: "Submission", key: "submission" },
+//     ],
+//   }
+
+//   // fetch workstreams
+//   const fetchWorkstreams = async () => {
+//     try {
+//       const res = await axios.get(
+//         `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream-list`,
+//         { withCredentials: true }
+//       )
+//       if (res.data.success) {
+//         setDynamicWorkstreams(res.data.data)
+//       }
+//     } catch (err) {
+//       console.error("Error fetching workstreams:", err)
+//     }
+//   }
+
+//   useEffect(() => {
+//     fetchWorkstreams()
+//   }, [])
+
+//   // fetch workstream data
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         let endpoint = ""
+//         let configKey = ""
+
+//         if (selectedWorkstream === "workstream1") {
+//           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream`
+//           configKey = "workstream1"
+//         } else if (selectedWorkstream === "workstream2") {
+//           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2`
+//           configKey = "workstream2"
+//         } else if (selectedWorkstream === "workstream3") {
+//           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream3`
+//           configKey = "workstream3"
+//         } else {
+//           const dynamicId = selectedWorkstream.replace("dynamic-", "")
+//           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream/${dynamicId}`
+//           configKey = "dynamic"
+//         }
+
+//         const res = await axios.get(endpoint, { withCredentials: true })
+//         if (res.data.success) {
+//           const fetchedData = res.data.data
+//           if (configKey === "dynamic" || configKey === "workstream3") {
+//             const allKeys = new Set()
+//             fetchedData.forEach((item) => {
+//               if (item.submission) {
+//                 Object.keys(item.submission).forEach((k) => allKeys.add(k))
+//               }
+//             })
+//             const dynamicColumns = Array.from(allKeys).map((key) => ({
+//               header: key,
+//               key: key,
+//             }))
+//             const flattened = fetchedData.map((item) => ({
+//               id: item.id,
+//               ...item.submission,
+//             }))
+//             setData(flattened)
+//             setCurrentColumns(dynamicColumns)
+//           } else {
+//             setData(fetchedData)
+//             setCurrentColumns(columnConfigurations[configKey] || [])
+//           }
+//         } else {
+//           setData([])
+//           setCurrentColumns([])
+//         }
+//       } catch (err) {
+//         console.error("Error fetching workstream data:", err)
+//         setData([])
+//         setCurrentColumns([])
+//       }
+//     }
+
+//     if (dynamicWorkstreams.length > 0 || selectedWorkstream === "workstream1") {
+//       fetchData()
+//     }
+//   }, [selectedWorkstream, dynamicWorkstreams])
+
+//   // delete handler
+//   const handleDelete = async (id, wsType) => {
+//     if (!confirm("Are you sure you want to delete this record?")) return
+
+//     let deleteUrl = ""
+//     if (wsType === "workstream1") {
+//       deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/api/workspace_data/${id}`
+//     } else if (wsType === "workstream2") {
+//       deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record-by-id/${id}`
+//     } else if (wsType === "workstream3") {
+//       deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream3/${id}`
+//     } else if (wsType.startsWith("dynamic-")) {
+//       const dynamicId = wsType.replace("dynamic-", "")
+//       deleteUrl = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream/${dynamicId}/record/${id}`
+//     }
+
+//     try {
+//       const res = await fetch(deleteUrl, { method: "DELETE" })
+//       if (!res.ok) throw new Error("Failed to delete record")
+//       setData((prev) => prev.filter((item) => item.id !== id))
+//     } catch (err) {
+//       console.error("Delete error:", err)
+//       alert(err.message)
+//     }
+//   }
+
+//   // add workstream
+//   const handleAddWorkstream = async () => {
+//     if (!newWorkstreamName.trim()) {
+//       setError("Workstream name is required")
+//       return
+//     }
+//     try {
+//       const res = await axios.post(
+//         `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream-list`,
+//         { name: newWorkstreamName.trim() },
+//         { withCredentials: true }
+//       )
+//       if (res.data.success) {
+//         setShowModal(false)
+//         setNewWorkstreamName("")
+//         setError("")
+//         fetchWorkstreams()
+//         setShowSuccessModal(true)
+//         setTimeout(() => setShowSuccessModal(false), 2000)
+//       } else {
+//         setError(res.data.message || "Failed to add workstream")
+//       }
+//     } catch (err) {
+//       console.error("Failed to add workstream", err)
+//       setError("Error while adding workstream")
+//     }
+//   }
+
+//   // export excel
+//   const exportToExcel = () => {
+//     if (data.length === 0) {
+//       alert("No data to export.")
+//       return
+//     }
+//     const worksheet = XLSX.utils.json_to_sheet(data)
+//     const workbook = XLSX.utils.book_new()
+//     XLSX.utils.book_append_sheet(workbook, worksheet, selectedWorkstream)
+//     XLSX.writeFile(workbook, `${selectedWorkstream}_data.xlsx`)
+//   }
+
+//   return (
+//     <div className="admin-dashboard-container">
+//       <Sidebar />
+//       <div className="main-content">
+//         <div className="page-content">
+//           <h2 style={{ textAlign: "center" }}>Workstreams</h2>
+
+//           {/* Workstream Cards */}
+//           <div className="workstream-cards">
+//             <div
+//               className={`workstream-card ${
+//                 selectedWorkstream === "workstream1" ? "selected" : ""
+//               }`}
+//               onClick={() => setSelectedWorkstream("workstream1")}
+//             >
+//               <h3>Workstream 1</h3>
+//               <p>{selectedWorkstream === "workstream1" ? data.length : "0"} Rows</p>
+//             </div>
+
+//             <div
+//               className={`workstream-card ${
+//                 selectedWorkstream === "workstream2" ? "selected" : ""
+//               }`}
+//               onClick={() => setSelectedWorkstream("workstream2")}
+//             >
+//               <h3>Workstream 2</h3>
+//               <p>{selectedWorkstream === "workstream2" ? data.length : "0"} Rows</p>
+//             </div>
+
+//             <div
+//               className={`workstream-card ${
+//                 selectedWorkstream === "workstream3" ? "selected" : ""
+//               }`}
+//               onClick={() => setSelectedWorkstream("workstream3")}
+//             >
+//               <h3>Workstream 3</h3>
+//               <p>{selectedWorkstream === "workstream3" ? data.length : "0"} Rows</p>
+//             </div>
+
+//             {dynamicWorkstreams
+//               .filter(
+//                 (ws) =>
+//                   ws.name !== "Workstream 1" &&
+//                   ws.name !== "Workstream 2" &&
+//                   ws.name !== "Workstream 3"
+//               )
+//               .map((ws) => (
+//                 <div
+//                   key={ws.id}
+//                   className={`workstream-card ${
+//                     selectedWorkstream === `dynamic-${ws.id}` ? "selected" : ""
+//                   }`}
+//                   onClick={() => setSelectedWorkstream(`dynamic-${ws.id}`)}
+//                 >
+//                   <h3>{ws.name}</h3>
+//                   <p>
+//                     {selectedWorkstream === `dynamic-${ws.id}` ? data.length : "0"} Rows
+//                   </p>
+//                 </div>
+//               ))}
+
+//             {/* Add Workstream */}
+//             <div className="workstream-card add-card">
+//               <button
+//                 onClick={() => setShowModal(true)}
+//                 style={{
+//                   padding: "8px 12px",
+//                   background: "#2563eb",
+//                   color: "white",
+//                   borderRadius: "6px",
+//                   border: "none",
+//                   cursor: "pointer",
+//                 }}
+//               >
+//                 + Add Workstream
+//               </button>
+//             </div>
+//           </div>
+
+//           {/* Actions */}
+//           <div
+//             style={{
+//               marginTop: 20,
+//               display: "flex",
+//               justifyContent: "flex-end",
+//               gap: "10px",
+//             }}
+//           >
+//             <button onClick={exportToExcel} disabled={data.length === 0}>
+//               Export
+//             </button>
+//           </div>
+
+//           {/* Table */}
+//           <div
+//             className="workstream-table"
+//             style={{
+//               overflowX: "auto",
+//               overflowY: "auto",
+//               maxHeight: "500px",
+//               border: "1px solid #ddd",
+//               marginTop: "20px",
+//             }}
+//           >
+//             <table style={{ minWidth: "1200px" }}>
+//               <thead>
+//                 <tr>
+//                   {currentColumns.map((col) => (
+//                     <th key={col.key}>{col.header}</th>
+//                   ))}
+//                   <th>Action</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {data.length === 0 ? (
+//                   <tr>
+//                     <td
+//                       colSpan={currentColumns.length + 1}
+//                       style={{ textAlign: "center" }}
+//                     >
+//                       No data found
+//                     </td>
+//                   </tr>
+//                 ) : (
+//                   data.map((item) => (
+//                     <tr key={item.id}>
+//                       {currentColumns.map((col) => (
+//                         <td key={`${item.id}-${col.key}`}>
+//                           {col.render
+//                             ? col.render(item)
+//                             : item[col.key] ?? "N/A"}
+//                         </td>
+//                       ))}
+//                       <td>
+//                         <FiTrash2
+//                           onClick={() => handleDelete(item.id, selectedWorkstream)}
+//                           style={{
+//                             cursor: "pointer",
+//                             color: "crimson",
+//                             fontSize: "18px",
+//                             marginLeft: "10px",
+//                           }}
+//                         />
+//                       </td>
+//                     </tr>
+//                   ))
+//                 )}
+//               </tbody>
+//             </table>
+//           </div>
+//           <p style={{ marginTop: "10px" }}>{data.length} users</p>
+//         </div>
+//       </div>
+
+//       {/* Add Workstream Modal */}
+//       {/* Add Workstream Modal */}
+// {showModal && (
+//   <div className="modal-overlay">
+//     <div className="modal-box">
+//       {/* Close Button */}
+//       <button
+//         className="close-btn"
+//         onClick={() => setShowModal(false)}
+//       >
+//         ✖
+//       </button>
+
+//       <h3>Add New Workstream</h3>
+//       <input
+//         type="text"
+//         placeholder="Workstream name"
+//         value={newWorkstreamName}
+//         onChange={(e) => setNewWorkstreamName(e.target.value)}
+//       />
+//       {error && <p style={{ color: "red" }}>{error}</p>}
+//       <div className="modal-buttons">
+//         <button className="save-btn" onClick={handleAddWorkstream}>
+//           Save
+//         </button>
+//         <button className="cancel-btn" onClick={() => setShowModal(false)}>
+//           Cancel
+//         </button>
+//       </div>
+//     </div>
+//   </div>
+// )}
+
+
+//       {/* Success Modal */}
+//       {showSuccessModal && (
+//         <div className="modal-overlay">
+//           <div className="modal-box">
+//             <p>✅ Operation completed successfully!</p>
+//           </div>
+//         </div>
+//       )}
+
+//       <style>{`
+//         .workstream-cards {
+//           display: flex;
+//           gap: 16px;
+//           margin: 20px 0;
+//           flex-wrap: wrap;
+//         }
+//         .workstream-card {
+//           flex: 1;
+//           border: 2px solid #e5e7eb;
+//           border-radius: 12px;
+//           padding: 20px;
+//           text-align: center;
+//           cursor: pointer;
+//           background: #fff;
+//         }
+//         .workstream-card.selected {
+//           border-color: #8b5cf6;
+//           background: #f5f3ff;
+//         }
+//         .workstream-table table {
+//           width: 100%;
+//           border-collapse: collapse;
+//           white-space: nowrap;
+//         }
+//         .workstream-table th, .workstream-table td {
+//           padding: 12px;
+//           border-bottom: 1px solid #ddd;
+//           text-align: left;
+//         }
+//         .workstream-table thead th {
+//           position: sticky;
+//           top: 0;
+//           background: #f9fafb;
+//           z-index: 1;
+//         }
+//         .modal-overlay {
+//   position: fixed;
+//   top: 0; left: 0;
+//   width: 100%; height: 100%;
+//   display: flex; justify-content: center; align-items: center;
+//   background: rgba(0,0,0,0.5);
+//   z-index: 9999;
+// }
+
+// .modal-box {
+//   background: white;
+//   padding: 30px;
+//   border-radius: 12px;
+//   width: 500px;
+//   max-width: 90%;
+//   position: relative;
+//   box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+//   text-align: center;
+// }
+
+// .modal-box h3 {
+//   margin-bottom: 20px;
+//   font-size: 20px;
+//   font-weight: 600;
+// }
+
+// .modal-box input {
+//   width: 100%;
+//   padding: 10px;
+//   margin-bottom: 15px;
+//   border-radius: 6px;
+//   border: 1px solid #ccc;
+//   font-size: 16px;
+// }
+
+// .modal-buttons {
+//   display: flex;
+//   justify-content: center;
+//   gap: 15px;
+// }
+
+// .modal-buttons button {
+//   padding: 10px 20px;
+//   border: none;
+//   border-radius: 6px;
+//   font-size: 16px;
+//   cursor: pointer;
+// }
+
+// .save-btn {
+//   background: #2563eb;
+//   color: white;
+// }
+
+// .cancel-btn {
+//   background: #e5e7eb;
+//   color: #333;
+// }
+
+// .close-btn {
+//   position: absolute;
+//   top: 12px;
+//   right: 12px;
+//   border: none;
+//   background: transparent;
+//   font-size: 18px;
+//   cursor: pointer;
+// }
+
+//       `}</style>
+//     </div>
+//   )
+// }
+
+// export default WorkstreamPage
+
+
+
 "use client"
 
 import { useState, useEffect } from "react"
+import { useAuth } from "../contexts/AuthContext"
+import { ChevronDown, User, LogOut } from "lucide-react"
 import Sidebar from "../component/Sidebar"
 import "../styles/Layout.css"
 import axios from "axios"
@@ -1742,10 +2621,23 @@ import { FiTrash2 } from "react-icons/fi"
 import * as XLSX from "xlsx"
 
 const WorkstreamPage = () => {
+  const { user, logout } = useAuth()
+  const [showUserDropdown, setShowUserDropdown] = useState(false)
+
   const [selectedWorkstream, setSelectedWorkstream] = useState("workstream1")
   const [data, setData] = useState([])
   const [dynamicWorkstreams, setDynamicWorkstreams] = useState([])
   const [currentColumns, setCurrentColumns] = useState([])
+
+  const [showModal, setShowModal] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [newWorkstreamName, setNewWorkstreamName] = useState("")
+  const [error, setError] = useState("")
+
+  const handleLogout = () => {
+    logout()
+    setShowUserDropdown(false)
+  }
 
   const columnConfigurations = {
     workstream1: [
@@ -1791,11 +2683,9 @@ const WorkstreamPage = () => {
     workstream3: [
       { header: "ID", key: "id" },
       { header: "Submission", key: "submission" },
-      // Additional columns can be added here dynamically
     ],
   }
 
-  // Fetch workstream list
   const fetchWorkstreams = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream-list`, {
@@ -1804,8 +2694,8 @@ const WorkstreamPage = () => {
       if (res.data.success) {
         setDynamicWorkstreams(res.data.data)
       }
-    } catch (error) {
-      console.error("Error fetching workstreams:", error)
+    } catch (err) {
+      console.error("Error fetching workstreams:", err)
     }
   }
 
@@ -1813,9 +2703,8 @@ const WorkstreamPage = () => {
     fetchWorkstreams()
   }, [])
 
-  // Fetch data of selected workstream
   useEffect(() => {
-    const fetchWorkstreamData = async () => {
+    const fetchData = async () => {
       try {
         let endpoint = ""
         let configKey = ""
@@ -1830,7 +2719,6 @@ const WorkstreamPage = () => {
           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream3`
           configKey = "workstream3"
         } else {
-          // dynamic workstream
           const dynamicId = selectedWorkstream.replace("dynamic-", "")
           endpoint = `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream/${dynamicId}`
           configKey = "dynamic"
@@ -1839,7 +2727,6 @@ const WorkstreamPage = () => {
         const res = await axios.get(endpoint, { withCredentials: true })
         if (res.data.success) {
           const fetchedData = res.data.data
-
           if (configKey === "dynamic" || configKey === "workstream3") {
             const allKeys = new Set()
             fetchedData.forEach((item) => {
@@ -1847,17 +2734,14 @@ const WorkstreamPage = () => {
                 Object.keys(item.submission).forEach((k) => allKeys.add(k))
               }
             })
-
             const dynamicColumns = Array.from(allKeys).map((key) => ({
               header: key,
               key: key,
             }))
-
             const flattened = fetchedData.map((item) => ({
               id: item.id,
               ...item.submission,
             }))
-
             setData(flattened)
             setCurrentColumns(dynamicColumns)
           } else {
@@ -1868,19 +2752,18 @@ const WorkstreamPage = () => {
           setData([])
           setCurrentColumns([])
         }
-      } catch (error) {
-        console.error("Error fetching workstream data:", error)
+      } catch (err) {
+        console.error("Error fetching workstream data:", err)
         setData([])
         setCurrentColumns([])
       }
     }
 
     if (dynamicWorkstreams.length > 0 || selectedWorkstream === "workstream1") {
-      fetchWorkstreamData()
+      fetchData()
     }
   }, [selectedWorkstream, dynamicWorkstreams])
 
-  // Delete handler
   const handleDelete = async (id, wsType) => {
     if (!confirm("Are you sure you want to delete this record?")) return
 
@@ -1899,7 +2782,6 @@ const WorkstreamPage = () => {
     try {
       const res = await fetch(deleteUrl, { method: "DELETE" })
       if (!res.ok) throw new Error("Failed to delete record")
-
       setData((prev) => prev.filter((item) => item.id !== id))
     } catch (err) {
       console.error("Delete error:", err)
@@ -1907,7 +2789,33 @@ const WorkstreamPage = () => {
     }
   }
 
-  // Export to Excel
+  const handleAddWorkstream = async () => {
+    if (!newWorkstreamName.trim()) {
+      setError("Workstream name is required")
+      return
+    }
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream-list`,
+        { name: newWorkstreamName.trim() },
+        { withCredentials: true },
+      )
+      if (res.data.success) {
+        setShowModal(false)
+        setNewWorkstreamName("")
+        setError("")
+        fetchWorkstreams()
+        setShowSuccessModal(true)
+        setTimeout(() => setShowSuccessModal(false), 2000)
+      } else {
+        setError(res.data.message || "Failed to add workstream")
+      }
+    } catch (err) {
+      console.error("Failed to add workstream", err)
+      setError("Error while adding workstream")
+    }
+  }
+
   const exportToExcel = () => {
     if (data.length === 0) {
       alert("No data to export.")
@@ -1915,19 +2823,50 @@ const WorkstreamPage = () => {
     }
     const worksheet = XLSX.utils.json_to_sheet(data)
     const workbook = XLSX.utils.book_new()
-    const workstreamName = selectedWorkstream
-    XLSX.utils.book_append_sheet(workbook, worksheet, workstreamName)
-    XLSX.writeFile(workbook, `${workstreamName}_data.xlsx`)
+    XLSX.utils.book_append_sheet(workbook, worksheet, selectedWorkstream)
+    XLSX.writeFile(workbook, `${selectedWorkstream}_data.xlsx`)
   }
 
   return (
     <div className="admin-dashboard-container">
       <Sidebar />
       <div className="main-content">
-        <div className="page-content">
-          <h2 style={{ textAlign: "center" }}>Workstreams</h2>
+        <div className="dashboard-header">
+          <h2>Workstreams</h2>
+          <div className="user-section">
+            <div className="user-dropdown">
+              <button className="user-button" onClick={() => setShowUserDropdown(!showUserDropdown)}>
+                <div className="user-avatar">
+                  <User size={20} />
+                </div>
+                <div className="user-info">
+                  <span className="user-name">{user?.name || "Admin"}</span>
+                  <span className="user-role">{user?.role || "admin"}</span>
+                </div>
+                <ChevronDown size={16} />
+              </button>
 
-          {/* Workstream Cards */}
+              {showUserDropdown && (
+                <div className="dropdown-menu">
+                  <div className="dropdown-header">
+                    <div className="user-details">
+                      <p className="user-name">{user?.name || "Admin User"}</p>
+                      <p className="user-email">{user?.email || "admin@example.com"}</p>
+                      <p className="user-role-badge">{user?.role || "admin"}</p>
+                    </div>
+                  </div>
+                  <div className="dropdown-divider"></div>
+                  <button className="dropdown-item logout-item" onClick={handleLogout}>
+                    <LogOut size={16} />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="page-content">
           <div className="workstream-cards">
             <div
               className={`workstream-card ${selectedWorkstream === "workstream1" ? "selected" : ""}`}
@@ -1965,16 +2904,37 @@ const WorkstreamPage = () => {
                   <p>{selectedWorkstream === `dynamic-${ws.id}` ? data.length : "0"} Rows</p>
                 </div>
               ))}
+
+            <div className="workstream-card add-card">
+              <button
+                onClick={() => setShowModal(true)}
+                style={{
+                  padding: "8px 12px",
+                  background: "#2563eb",
+                  color: "white",
+                  borderRadius: "6px",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                + Add Workstream
+              </button>
+            </div>
           </div>
 
-          {/* Actions */}
-          <div style={{ marginTop: 20, display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+          <div
+            style={{
+              marginTop: 20,
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "10px",
+            }}
+          >
             <button onClick={exportToExcel} disabled={data.length === 0}>
               Export
             </button>
           </div>
 
-          {/* Data Table */}
           <div
             className="workstream-table"
             style={{
@@ -2006,17 +2966,18 @@ const WorkstreamPage = () => {
                     <tr key={item.id}>
                       {currentColumns.map((col) => (
                         <td key={`${item.id}-${col.key}`}>
-                          {col.render
-                            ? col.render(item)
-                            : item[col.key] !== undefined && item[col.key] !== null && item[col.key] !== ""
-                              ? item[col.key]
-                              : "N/A"}
+                          {col.render ? col.render(item) : (item[col.key] ?? "N/A")}
                         </td>
                       ))}
                       <td>
                         <FiTrash2
                           onClick={() => handleDelete(item.id, selectedWorkstream)}
-                          style={{ cursor: "pointer", color: "crimson", fontSize: "18px", marginLeft: "10px" }}
+                          style={{
+                            cursor: "pointer",
+                            color: "crimson",
+                            fontSize: "18px",
+                            marginLeft: "10px",
+                          }}
                         />
                       </td>
                     </tr>
@@ -2029,11 +2990,47 @@ const WorkstreamPage = () => {
         </div>
       </div>
 
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <button className="close-btn" onClick={() => setShowModal(false)}>
+              ✖
+            </button>
+
+            <h3>Add New Workstream</h3>
+            <input
+              type="text"
+              placeholder="Workstream name"
+              value={newWorkstreamName}
+              onChange={(e) => setNewWorkstreamName(e.target.value)}
+            />
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <div className="modal-buttons">
+              <button className="save-btn" onClick={handleAddWorkstream}>
+                Save
+              </button>
+              <button className="cancel-btn" onClick={() => setShowModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSuccessModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <p>✅ Operation completed successfully!</p>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .workstream-cards {
           display: flex;
           gap: 16px;
           margin: 20px 0;
+          flex-wrap: wrap;
         }
         .workstream-card {
           flex: 1;
@@ -2063,6 +3060,219 @@ const WorkstreamPage = () => {
           top: 0;
           background: #f9fafb;
           z-index: 1;
+        }
+        .modal-overlay {
+          position: fixed;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          display: flex; justify-content: center; align-items: center;
+          background: rgba(0,0,0,0.5);
+          z-index: 9999;
+        }
+
+        .modal-box {
+          background: white;
+          padding: 30px;
+          border-radius: 12px;
+          width: 500px;
+          max-width: 90%;
+          position: relative;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+          text-align: center;
+        }
+
+        .modal-box h3 {
+          margin-bottom: 20px;
+          font-size: 20px;
+          font-weight: 600;
+        }
+
+        .modal-box input {
+          width: 100%;
+          padding: 10px;
+          margin-bottom: 15px;
+          border-radius: 6px;
+          border: 1px solid #ccc;
+          font-size: 16px;
+        }
+
+        .modal-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 15px;
+        }
+
+        .modal-buttons button {
+          padding: 10px 20px;
+          border: none;
+          border-radius: 6px;
+          font-size: 16px;
+          cursor: pointer;
+        }
+
+        .save-btn {
+          background: #2563eb;
+          color: white;
+        }
+
+        .cancel-btn {
+          background: #e5e7eb;
+          color: #333;
+        }
+
+        .close-btn {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          border: none;
+          background: transparent;
+          font-size: 18px;
+          cursor: pointer;
+        }
+
+        .dashboard-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem 2rem;
+          background: white;
+          border-bottom: 1px solid #e5e7eb;
+          margin-bottom: 1rem;
+        }
+
+        .dashboard-header h2 {
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #1f2937;
+        }
+
+        .user-section {
+          position: relative;
+        }
+
+        .user-dropdown {
+          position: relative;
+        }
+
+        .user-button {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.5rem 1rem;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .user-button:hover {
+          background: #f3f4f6;
+          border-color: #d1d5db;
+        }
+
+        .user-avatar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 2rem;
+          height: 2rem;
+          background: #3b82f6;
+          color: white;
+          border-radius: 50%;
+        }
+
+        .user-info {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .user-name {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #1f2937;
+          margin: 0;
+        }
+
+        .user-role {
+          font-size: 0.75rem;
+          color: #6b7280;
+          text-transform: capitalize;
+          margin: 0;
+        }
+
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          right: 0;
+          margin-top: 0.5rem;
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          min-width: 200px;
+          z-index: 50;
+        }
+
+        .dropdown-header {
+          padding: 1rem;
+        }
+
+        .user-details .user-name {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #1f2937;
+          margin-bottom: 0.25rem;
+        }
+
+        .user-email {
+          font-size: 0.75rem;
+          color: #6b7280;
+          margin-bottom: 0.5rem;
+        }
+
+        .user-role-badge {
+          display: inline-block;
+          padding: 0.25rem 0.5rem;
+          background: #dbeafe;
+          color: #1e40af;
+          font-size: 0.75rem;
+          font-weight: 500;
+          border-radius: 0.25rem;
+          text-transform: capitalize;
+        }
+
+        .dropdown-divider {
+          height: 1px;
+          background: #e5e7eb;
+          margin: 0;
+        }
+
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          width: 100%;
+          padding: 0.75rem 1rem;
+          background: none;
+          border: none;
+          text-align: left;
+          cursor: pointer;
+          transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+          background: #f9fafb;
+        }
+
+        .logout-item {
+          color: #dc2626;
+        }
+
+        .logout-item:hover {
+          background: #fef2f2;
         }
       `}</style>
     </div>
