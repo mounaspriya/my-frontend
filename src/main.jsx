@@ -17,10 +17,12 @@ import UsersPage from './pages/UsersPage.jsx';
 import AdminWorkstream from './pages/AdminWorkstream.jsx';
 import ConfigurePage from './component/ConfigurePage.jsx';
 import NewRecordPage from "./pages/NewRecordPage.jsx";
+import { SearchProvider } from "./component/SearchContext.jsx"
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
+   <SearchProvider>
     <Routes>
       {/* Set Register as default page on "/" */}
       <Route path="/" element={<Register />} />
@@ -35,7 +37,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Route path="/workspace/1/view" element={<WorkspaceDataViewer />} />
         <Route path="/edit/:id" element={<EditWorkspace />} />
          <Route path="/admindashboard" element={<AdminDashboard />} />
+            
+
              <Route path="/dashboardview" element={<DashboardView />} />
+            
              <Route path="/users" element={<UsersPage />} />
              <Route path="/workstream" element={<AdminWorkstream />} />
                 <Route path="/workstream/configure" element={<ConfigurePage />} />
@@ -43,5 +48,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 
     </Routes>
+       </SearchProvider>
   </BrowserRouter>
 );

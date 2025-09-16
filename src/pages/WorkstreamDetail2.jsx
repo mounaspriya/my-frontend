@@ -797,14 +797,1035 @@
 
 
 
+// "use client"
+
+// import { useState, useEffect } from "react"
+// import { Filter, Download, Share, Plus, Edit, ArrowLeft, Settings, X, Check, Eye } from "lucide-react"
+// import EditWorkstream2Form from "../component/EditWorkstream2"
+// import * as XLSX from "xlsx"
+
+// // Inline styles object
+// const styles = {
+//   container: { minHeight: "100vh", backgroundColor: "#f9fafb" },
+//   main: { padding: "24px", maxWidth: "1400px", margin: "0 auto" },
+//   backButton: {
+//     display: "flex",
+//     alignItems: "center",
+//     gap: "8px",
+//     background: "transparent",
+//     border: "none",
+//     color: "#6b7280",
+//     cursor: "pointer",
+//     fontSize: "14px",
+//     marginBottom: "16px",
+//     padding: "8px 0",
+//   },
+//   pageHeader: {
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//     marginBottom: "24px",
+//   },
+//   pageTitle: { fontSize: "24px", fontWeight: "600", color: "#111827" },
+//   actionButtons: { display: "flex", alignItems: "center", gap: "12px" },
+//   actionButton: {
+//     display: "flex",
+//     alignItems: "center",
+//     gap: "8px",
+//     padding: "8px 16px",
+//     border: "1px solid #d1d5db",
+//     borderRadius: "6px",
+//     backgroundColor: "white",
+//     color: "#374151",
+//     fontSize: "14px",
+//     cursor: "pointer",
+//     fontWeight: "500",
+//   },
+//   primaryButton: { backgroundColor: "#3b82f6", color: "white", border: "1px solid #3b82f6" },
+//   actionButtonDisabled: {
+//     display: "flex",
+//     alignItems: "center",
+//     gap: "8px",
+//     padding: "8px 16px",
+//     border: "1px solid #d1d5db",
+//     borderRadius: "6px",
+//     backgroundColor: "#f9fafb",
+//     color: "#9ca3af",
+//     fontSize: "14px",
+//     cursor: "not-allowed",
+//     fontWeight: "500",
+//     opacity: 0.6,
+//   },
+//   table: {
+//     width: "100%",
+//     backgroundColor: "white",
+//     borderRadius: "8px",
+//     overflow: "hidden",
+//     boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+//   },
+//   tableHeader: { backgroundColor: "#f9fafb" },
+//   tableHeaderCell: {
+//     padding: "12px 24px",
+//     textAlign: "left",
+//     fontSize: "12px",
+//     fontWeight: "500",
+//     color: "#374151",
+//     textTransform: "uppercase",
+//     letterSpacing: "0.05em",
+//     borderBottom: "1px solid #e5e7eb",
+//   },
+//   tableRow: { borderBottom: "1px solid #f3f4f6" },
+//   tableCell: { padding: "16px 24px", fontSize: "14px", whiteSpace: "nowrap" },
+//   badge: {
+//     display: "inline-flex",
+//     alignItems: "center",
+//     padding: "2px 10px",
+//     borderRadius: "9999px",
+//     fontSize: "12px",
+//     fontWeight: "500",
+//   },
+//   button: {
+//     background: "transparent",
+//     border: "none",
+//     padding: "4px",
+//     borderRadius: "4px",
+//     cursor: "pointer",
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   modalOverlay: {
+//     position: "fixed",
+//     top: 0,
+//     left: 0,
+//     right: 0,
+//     bottom: 0,
+//     backgroundColor: "rgba(0, 0, 0, 0.5)",
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "center",
+//     zIndex: 1000,
+//   },
+//   modalBox: {
+//     background: "#fff",
+//     borderRadius: "8px",
+//     padding: "20px",
+//     maxWidth: "800px",
+//     width: "90%",
+//     maxHeight: "80vh",
+//     overflowY: "auto",
+//   },
+//   modalHeader: {
+//     display: "flex",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     marginBottom: "20px",
+//     borderBottom: "1px solid #e5e7eb",
+//     paddingBottom: "10px",
+//   },
+//   closeButton: { background: "transparent", border: "none", cursor: "pointer", padding: "4px" },
+// }
+
+// // Badge colors
+// const badgeVariants = {
+//   green: { backgroundColor: "#dcfce7", color: "#16a34a" },
+//   yellow: { backgroundColor: "#fef3c7", color: "#d97706" },
+//   red: { backgroundColor: "#fee2e2", color: "#dc2626" },
+//   gray: { backgroundColor: "#f3f4f6", color: "#374151" },
+// }
+
+// export default function Workstream2Detail({ workstreamId = "02", onBack }) {
+//   const [searchQuery, setSearchQuery] = useState("")
+//   const [workstreamData, setWorkstreamData] = useState([])
+//   const [loading, setLoading] = useState(true)
+//   const [error, setError] = useState(null)
+
+//   // Edit states
+//   const [editingRecordId, setEditingRecordId] = useState(null)
+//   const [showEditForm, setShowEditForm] = useState(false)
+
+//   // View states
+//   const [showViewModal, setShowViewModal] = useState(false)
+//   const [viewRecord, setViewRecord] = useState(null)
+
+//   // Column customization
+//   const [showFieldSelector, setShowFieldSelector] = useState(false)
+//   const [selectedFields, setSelectedFields] = useState([
+//     "case_no",
+//     "test_successful",
+//     "card_no",
+//     "card_country",
+//     "expiry_date",
+//     "email",
+//     "tested_on_date",
+//   ])
+//   const [tempSelectedFields, setTempSelectedFields] = useState([])
+//   const alwaysVisibleFields = ["case_no", "test_successful"]
+
+//   const allFields = {
+//     case_no: "Case No.",
+//     test_successful: "Test Successful",
+//     card_no: "Card No",
+//     card_country: "Card Country",
+//     expiry_date: "Expiry Date",
+//     cvv: "CVV",
+//     email: "Email",
+//     tested_url_homepage: "Tested URL Homepage",
+//     tested_url: "Tested URL",
+//     tested_on_date: "Tested on Date",
+//     tested_amount: "Tested Amount",
+//     tested_currency: "Tested Currency",
+//     billing_address: "Billing Address",
+//     billing_phone_number: "Billing Phone Number",
+//     billing_name: "Billing Name",
+//     declined_message: "Declined Message",
+//     not_tested_breakup: "Not Tested Breakup",
+//     comments: "Comments",
+//     id_verification_required: "ID Verification Required",
+//     bypass_id_verification: "Bypass ID Verification",
+//     violation_tested_product: "Violation Tested Product",
+//     merchant_name: "Merchant Name",
+//     log_generated: "Log Generated Y/N",
+//     created_at: "Created At",
+//   }
+
+//   // Fetch workstream2 data
+//   const fetchWorkstreamData = async () => {
+//     try {
+//       setLoading(true)
+//       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2`)
+//       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+//       const data = await response.json()
+//       if (data.success && data.data) {
+//         setWorkstreamData(data.data)
+//       } else {
+//         setWorkstreamData([])
+//       }
+//       setError(null)
+//     } catch (err) {
+//       setError(`Failed to load workstream 2 data: ${err.message}`)
+//       setWorkstreamData([])
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+//   useEffect(() => {
+//     fetchWorkstreamData()
+//   }, [workstreamId])
+
+//   // --- Edit ---
+//   const handleEditRecord = (recordId) => {
+//     setEditingRecordId(recordId)
+//     setShowEditForm(true)
+//   }
+//   const handleBackToList = () => {
+//     setShowEditForm(false)
+//     setEditingRecordId(null)
+//     fetchWorkstreamData()
+//   }
+//   const handleSaveRecord = (updatedRecord) => {
+//     setWorkstreamData((prev) => prev.map((r) => (r.case_no === updatedRecord.case_no ? updatedRecord : r)))
+//   }
+
+//   // --- View ---
+//   const handleViewRecord = (record) => {
+//     setViewRecord(record)
+//     setShowViewModal(true)
+//   }
+//   const handleCloseViewModal = () => {
+//     setViewRecord(null)
+//     setShowViewModal(false)
+//   }
+
+//   // Format field value
+//   const formatFieldValue = (item, fieldKey) => {
+//     const value = item[fieldKey]
+//     switch (fieldKey) {
+//       case "expiry_date":
+//       case "tested_on_date":
+//       case "created_at":
+//         return value ? value.split("T")[0] : "N/A"
+//       case "tested_amount":
+//         return value ? `$${parseFloat(value).toFixed(2)}` : "N/A"
+//       case "card_no":
+//         return value ? `****-****-****-${value.toString().slice(-4)}` : "N/A"
+//       case "cvv":
+//         return value ? "***" : "N/A"
+//       case "billing_address":
+//       case "not_tested_breakup":
+//         return value ? (value.length > 50 ? `${value.substring(0, 50)}...` : value) : "N/A"
+//       default:
+//         return value || "N/A"
+//     }
+//   }
+
+//   const getTestSuccessfulBadge = (status) => {
+//     const badgeStyle = { ...styles.badge }
+//     switch (status?.toLowerCase()) {
+//       case "yes":
+//       case "successful":
+//       case "passed":
+//         return <span style={{ ...badgeStyle, ...badgeVariants.green }}>Successful</span>
+//       case "no":
+//       case "failed":
+//       case "unsuccessful":
+//         return <span style={{ ...badgeStyle, ...badgeVariants.red }}>Failed</span>
+//       case "pending":
+//         return <span style={{ ...badgeStyle, ...badgeVariants.yellow }}>Pending</span>
+//       default:
+//         return <span style={{ ...badgeStyle, ...badgeVariants.gray }}>{status || "N/A"}</span>
+//     }
+//   }
+
+//   const filteredData = workstreamData.filter(
+//     (record) =>
+//       (record.merchant_name && record.merchant_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+//       (record.card_country && record.card_country.toLowerCase().includes(searchQuery.toLowerCase())) ||
+//       (record.email && record.email.toLowerCase().includes(searchQuery.toLowerCase())),
+//   )
+
+//   // Show edit form
+//   if (showEditForm && editingRecordId) {
+//     return <EditWorkstream2Form recordId={editingRecordId} onBack={handleBackToList} onSave={handleSaveRecord} />
+//   }
+
+//   return (
+//     <div style={styles.container}>
+//       <main style={styles.main}>
+//         {/* Back Button */}
+//         <button style={styles.backButton} onClick={onBack}>
+//           <ArrowLeft size={16} /> Back to Dashboard
+//         </button>
+
+//         {/* Page Header */}
+//         <div style={styles.pageHeader}>
+//           <h1 style={styles.pageTitle}>Workstream {workstreamId} - Payment Testing</h1>
+//         </div>
+
+//         {/* Data Table */}
+//         <div style={styles.table}>
+//           {loading ? (
+//             <div style={{ padding: "40px", textAlign: "center" }}>Loading...</div>
+//           ) : error ? (
+//             <div style={{ padding: "40px", textAlign: "center", color: "#dc2626" }}>{error}</div>
+//           ) : (
+//             <table style={{ width: "100%" }}>
+//               <thead style={styles.tableHeader}>
+//                 <tr>
+//                   {selectedFields.map((f) => (
+//                     <th key={f} style={styles.tableHeaderCell}>
+//                       {allFields[f]}
+//                     </th>
+//                   ))}
+//                   <th style={styles.tableHeaderCell}>Actions</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {filteredData.length === 0 ? (
+//                   <tr>
+//                     <td colSpan={selectedFields.length + 1} style={{ textAlign: "center", padding: "20px" }}>
+//                       No data
+//                     </td>
+//                   </tr>
+//                 ) : (
+//                   filteredData.map((record) => (
+//                     <tr key={record.case_no} style={styles.tableRow}>
+//                       {selectedFields.map((f) => (
+//                         <td key={f} style={styles.tableCell}>
+//                           {f === "test_successful" ? getTestSuccessfulBadge(record[f]) : formatFieldValue(record, f)}
+//                         </td>
+//                       ))}
+//                       <td style={styles.tableCell}>
+//                         <div style={{ display: "flex", gap: "8px" }}>
+//                           <button style={styles.button} onClick={() => handleViewRecord(record)} title="View">
+//                             <Eye size={16} />
+//                           </button>
+//                           <button style={styles.button} onClick={() => handleEditRecord(record.id)} title="Edit">
+//                             <Edit size={16} />
+//                           </button>
+//                           <button
+//                             style={styles.button}
+//                             onClick={() => handleSingleRecordExport(record.case_no)}
+//                             title="Download"
+//                           >
+//                             <Download size={16} />
+//                           </button>
+//                         </div>
+//                       </td>
+//                     </tr>
+//                   ))
+//                 )}
+//               </tbody>
+//             </table>
+//           )}
+//         </div>
+//       </main>
+
+//       {/* View Modal */}
+//       {showViewModal && viewRecord && (
+//         <div style={styles.modalOverlay}>
+//           <div style={styles.modalBox}>
+//             <div style={styles.modalHeader}>
+//               <h3>Record Details</h3>
+//               <button onClick={handleCloseViewModal} style={styles.closeButton}>
+//                 <X size={20} />
+//               </button>
+//             </div>
+//             <table style={{ width: "100%", borderCollapse: "collapse" }}>
+//               <tbody>
+//                 {Object.entries(allFields).map(([key, label]) => (
+//                   <tr key={key} style={{ borderBottom: "1px solid #eee" }}>
+//                     <td style={{ fontWeight: "600", padding: "8px", width: "40%" }}>{label}</td>
+//                     <td style={{ padding: "8px" }}>
+//                       {key === "test_successful"
+//                         ? getTestSuccessfulBadge(viewRecord[key])
+//                         : formatFieldValue(viewRecord, key)}
+//                     </td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   )
+// }
+
+
+
+// "use client"
+
+// import { useState, useEffect } from "react"
+// import {
+//   Filter,
+//   Download,
+//   Share,
+//   Plus,
+//   Edit,
+//   ArrowLeft,
+//   Settings,
+//   X,
+//   Check,
+//   Eye,
+// } from "lucide-react"
+// import EditWorkstream2Form from "../component/EditWorkstream2"
+// import * as XLSX from "xlsx"
+
+
+
+// // Inline styles
+// const styles = {
+//   container: { minHeight: "100vh", backgroundColor: "#f9fafb" },
+//   main: { padding: "24px", maxWidth: "1400px", margin: "0 auto" },
+//   backButton: {
+//     display: "flex",
+//     alignItems: "center",
+//     gap: "8px",
+//     background: "transparent",
+//     border: "none",
+//     color: "#6b7280",
+//     cursor: "pointer",
+//     fontSize: "14px",
+//     marginBottom: "16px",
+//     padding: "8px 0",
+//   },
+//   pageHeader: {
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "space-between",
+//     marginBottom: "24px",
+//   },
+//   pageTitle: { fontSize: "24px", fontWeight: "600", color: "#111827" },
+//   actionButtons: { display: "flex", alignItems: "center", gap: "12px" },
+//   actionButton: {
+//     display: "flex",
+//     alignItems: "center",
+//     gap: "8px",
+//     padding: "8px 16px",
+//     border: "1px solid #d1d5db",
+//     borderRadius: "6px",
+//     backgroundColor: "white",
+//     color: "#374151",
+//     fontSize: "14px",
+//     cursor: "pointer",
+//     fontWeight: "500",
+//   },
+//   primaryButton: {
+//     backgroundColor: "#3b82f6",
+//     color: "white",
+//     border: "1px solid #3b82f6",
+//   },
+//   table: {
+//     width: "100%",
+//     backgroundColor: "white",
+//     borderRadius: "8px",
+//     overflow: "hidden",
+//     boxShadow: "0 1px 3px 0 rgba(0,0,0,0.1)",
+//   },
+//   tableHeader: { backgroundColor: "#f9fafb" },
+//   tableHeaderCell: {
+//     padding: "12px 24px",
+//     textAlign: "left",
+//     fontSize: "12px",
+//     fontWeight: "500",
+//     color: "#374151",
+//     textTransform: "uppercase",
+//     borderBottom: "1px solid #e5e7eb",
+//   },
+//   tableRow: { borderBottom: "1px solid #f3f4f6" },
+//   tableCell: { padding: "16px 24px", fontSize: "14px", whiteSpace: "nowrap" },
+//   badge: {
+//     display: "inline-flex",
+//     alignItems: "center",
+//     padding: "2px 10px",
+//     borderRadius: "9999px",
+//     fontSize: "12px",
+//     fontWeight: "500",
+//   },
+//   button: {
+//     background: "transparent",
+//     border: "none",
+//     padding: "4px",
+//     borderRadius: "4px",
+//     cursor: "pointer",
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   modalOverlay: {
+//     position: "fixed",
+//     top: 0,
+//     left: 0,
+//     right: 0,
+//     bottom: 0,
+//     backgroundColor: "rgba(0,0,0,0.5)",
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "center",
+//     zIndex: 1000,
+//   },
+//   modalBox: {
+//     background: "#fff",
+//     borderRadius: "8px",
+//     padding: "20px",
+//     maxWidth: "800px",
+//     width: "90%",
+//     maxHeight: "80vh",
+//     overflowY: "auto",
+//   },
+//   modalHeader: {
+//     display: "flex",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//     marginBottom: "20px",
+//     borderBottom: "1px solid #e5e7eb",
+//     paddingBottom: "10px",
+//   },
+//   closeButton: {
+//     background: "transparent",
+//     border: "none",
+//     cursor: "pointer",
+//     padding: "4px",
+//   },
+// }
+
+// const badgeVariants = {
+//   green: { backgroundColor: "#dcfce7", color: "#16a34a" },
+//   yellow: { backgroundColor: "#fef3c7", color: "#d97706" },
+//   red: { backgroundColor: "#fee2e2", color: "#dc2626" },
+//   gray: { backgroundColor: "#f3f4f6", color: "#374151" },
+// }
+
+// export default function Workstream2Detail({ workstreamId = "02", onBack }) {
+//   const [workstreamData, setWorkstreamData] = useState([])
+//   const [loading, setLoading] = useState(true)
+//   const [error, setError] = useState(null)
+
+//   // Edit states
+//   const [editingRecordId, setEditingRecordId] = useState(null)
+//   const [showEditForm, setShowEditForm] = useState(false)
+
+//   // View states
+//   const [showViewModal, setShowViewModal] = useState(false)
+//   const [viewRecord, setViewRecord] = useState(null)
+
+// const allFields = {
+//   case_no: "Case No",
+//   test_successful: "Test Successful",
+//   card_no: "Card No",
+//   card_country: "Card Country",
+//   expiry_date: "Expiry Date",
+//   email: "Email",
+//   tested_on_date: "Tested On Date",
+//   owner_name: "Owner Name",
+//   accessibility: "Accessibility",
+//   third_party_content: "Third Party Content",
+//   comments: "Comments",
+//   created_at: "Created At",
+//   updated_at: "Updated At",
+// }
+
+
+
+//   // Column customization
+// // Column customization
+// const [selectedFields, setSelectedFields] = useState([
+//   "case_no",
+//   "test_successful",
+//   "card_no",
+//   "card_country",
+//   "expiry_date",
+//   "email",
+//   "tested_on_date",
+// ])
+
+// const [showFieldSelector, setShowFieldSelector] = useState(false)
+// const [tempSelectedFields, setTempSelectedFields] = useState(selectedFields)
+// const alwaysVisibleFields = ["case_no", "test_successful"]
+
+
+//   // Fetch data
+//   const fetchWorkstreamData = async () => {
+//     try {
+//       setLoading(true)
+//       const response = await fetch(
+//         `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2`
+//       )
+//       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+//       const data = await response.json()
+//       if (data.success && data.data) {
+//         setWorkstreamData(data.data)
+//       } else {
+//         setWorkstreamData([])
+//       }
+//       setError(null)
+//     } catch (err) {
+//       setError(`Failed to load workstream 2 data: ${err.message}`)
+//       setWorkstreamData([])
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+
+//   useEffect(() => {
+//     fetchWorkstreamData()
+//   }, [workstreamId])
+
+//   // Edit
+//   const handleEditRecord = (recordId) => {
+//     setEditingRecordId(recordId)
+//     setShowEditForm(true)
+//   }
+//   const handleBackToList = () => {
+//     setShowEditForm(false)
+//     setEditingRecordId(null)
+//     fetchWorkstreamData()
+//   }
+
+//   // Add New
+//   const handleAddNew = () => {
+//     setEditingRecordId(null) // null means new record
+//     setShowEditForm(true)
+//   }
+
+//   // View
+//   const handleViewRecord = (record) => {
+//     setViewRecord(record)
+//     setShowViewModal(true)
+//   }
+//   const handleCloseViewModal = () => {
+//     setViewRecord(null)
+//     setShowViewModal(false)
+//   }
+
+//   //
+//   const handleFieldToggle = (fieldKey) => {
+//   if (alwaysVisibleFields.includes(fieldKey)) return
+//   if (tempSelectedFields.includes(fieldKey)) {
+//     setTempSelectedFields(tempSelectedFields.filter((f) => f !== fieldKey))
+//   } else if (tempSelectedFields.length < 10) {
+//     setTempSelectedFields([...tempSelectedFields, fieldKey])
+//   }
+// }
+
+// const applyFieldSelection = () => {
+//   setSelectedFields(tempSelectedFields)
+//   setShowFieldSelector(false)
+// }
+
+// const cancelFieldSelection = () => {
+//   setTempSelectedFields(selectedFields)
+//   setShowFieldSelector(false)
+// }
+
+
+//   // Export All
+//   const exportToCSV = () => {
+//     try {
+//       const exportData = workstreamData.map((record) => {
+//         const exportRecord = {}
+//         Object.keys(allFields).forEach((fieldKey) => {
+//           const displayName = allFields[fieldKey]
+//           exportRecord[displayName] =
+//             fieldKey === "accessibility"
+//               ? record[fieldKey] || "N/A"
+//               : formatFieldValue(record, fieldKey)
+//         })
+//         return exportRecord
+//       })
+//       const worksheet = XLSX.utils.json_to_sheet(exportData)
+//       const csv = XLSX.utils.sheet_to_csv(worksheet)
+//       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+//       const url = URL.createObjectURL(blob)
+//       const link = document.createElement("a")
+//       link.href = url
+//       const currentDate = new Date().toISOString().split("T")[0]
+//       link.download = `Workstream2_${currentDate}.csv`
+//       link.click()
+//       URL.revokeObjectURL(url)
+//     } catch (error) {
+//       console.error("CSV export failed:", error)
+//       alert("CSV export failed. Please try again.")
+//     }
+//   }
+
+//   // Format values
+//   const formatFieldValue = (item, fieldKey) => {
+//     const value = item[fieldKey]
+//     switch (fieldKey) {
+//       case "expiry_date":
+//       case "tested_on_date":
+//       case "created_at":
+//         return value ? value.split("T")[0] : "N/A"
+//       case "tested_amount":
+//         return value ? `$${parseFloat(value).toFixed(2)}` : "N/A"
+//       case "card_no":
+//         return value ? `****-****-****-${value.toString().slice(-4)}` : "N/A"
+//       case "cvv":
+//         return value ? "***" : "N/A"
+//       case "billing_address":
+//       case "not_tested_breakup":
+//         return value && value.length > 50
+//           ? `${value.substring(0, 50)}...`
+//           : value || "N/A"
+//       default:
+//         return value || "N/A"
+//     }
+//   }
+
+//   const getTestSuccessfulBadge = (status) => {
+//     const badgeStyle = { ...styles.badge }
+//     switch (status?.toLowerCase()) {
+//       case "yes":
+//       case "successful":
+//       case "passed":
+//         return <span style={{ ...badgeStyle, ...badgeVariants.green }}>Successful</span>
+//       case "no":
+//       case "failed":
+//       case "unsuccessful":
+//         return <span style={{ ...badgeStyle, ...badgeVariants.red }}>Failed</span>
+//       case "pending":
+//         return <span style={{ ...badgeStyle, ...badgeVariants.yellow }}>Pending</span>
+//       default:
+//         return (
+//           <span style={{ ...badgeStyle, ...badgeVariants.gray }}>
+//             {status || "N/A"}
+//           </span>
+//         )
+//     }
+//   }
+
+//   // Show Edit Form
+//   if (showEditForm) {
+//     return (
+//       <EditWorkstream2Form
+//         recordId={editingRecordId}
+//         onBack={handleBackToList}
+//       />
+//     )
+//   }
+
+//   return (
+//     <div style={styles.container}>
+//       <main style={styles.main}>
+//         {/* Back Button */}
+//         <button style={styles.backButton} onClick={onBack}>
+//           <ArrowLeft size={16} /> Back to Dashboard
+//         </button>
+
+//         {/* Header with actions */}
+//         <div style={styles.pageHeader}>
+//           <h1 style={styles.pageTitle}>
+//             Workstream {workstreamId} - Payment Testing
+//           </h1>
+//           <div style={styles.actionButtons}>
+//             <button style={styles.actionButton}>
+//               <Filter size={16} /> Filter
+//             </button>
+//             <button
+//               style={styles.actionButton}
+//               onClick={() => setShowFieldSelector(true)}
+//             >
+//               <Settings size={16} /> Manage Columns
+//             </button>
+//             <button style={styles.actionButton} onClick={exportToCSV}>
+//               <Download size={16} /> Export
+//             </button>
+//             <button style={styles.actionButton}>
+//               <Share size={16} /> Share
+//             </button>
+//             <button
+//               style={{ ...styles.actionButton, ...styles.primaryButton }}
+//               onClick={handleAddNew}
+//             >
+//               <Plus size={16} /> Add New
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* Table */}
+//         <div style={styles.table}>
+//           {loading ? (
+//             <div style={{ padding: "40px", textAlign: "center" }}>
+//               Loading...
+//             </div>
+//           ) : error ? (
+//             <div
+//               style={{ padding: "40px", textAlign: "center", color: "#dc2626" }}
+//             >
+//               {error}
+//             </div>
+//           ) : (
+//             <table style={{ width: "100%" }}>
+//               <thead style={styles.tableHeader}>
+//                 <tr>
+//                   {selectedFields.map((f) => (
+//                     <th key={f} style={styles.tableHeaderCell}>
+//                       {allFields[f]}
+//                     </th>
+//                   ))}
+//                   <th style={styles.tableHeaderCell}>Actions</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {workstreamData.length === 0 ? (
+//                   <tr>
+//                     <td
+//                       colSpan={selectedFields.length + 1}
+//                       style={{ textAlign: "center", padding: "20px" }}
+//                     >
+//                       No data
+//                     </td>
+//                   </tr>
+//                 ) : (
+//                   workstreamData.map((record) => (
+//                     <tr key={record.case_no} style={styles.tableRow}>
+//                       {selectedFields.map((f) => (
+//                         <td key={f} style={styles.tableCell}>
+//                           {f === "test_successful"
+//                             ? getTestSuccessfulBadge(record[f])
+//                             : formatFieldValue(record, f)}
+//                         </td>
+//                       ))}
+//                       <td style={styles.tableCell}>
+//                         <div style={{ display: "flex", gap: "8px" }}>
+//                           <button
+//                             style={styles.button}
+//                             onClick={() => handleViewRecord(record)}
+//                             title="View"
+//                           >
+//                             <Eye size={16} />
+//                           </button>
+//                           <button
+//                             style={styles.button}
+//                             onClick={() => handleEditRecord(record.id)}
+//                             title="Edit"
+//                           >
+//                             <Edit size={16} />
+//                           </button>
+//                         </div>
+//                       </td>
+//                     </tr>
+//                   ))
+//                 )}
+//               </tbody>
+//             </table>
+//           )}
+//         </div>
+//       </main>
+
+//       {/* View Modal */}
+//       {showViewModal && viewRecord && (
+//         <div style={styles.modalOverlay}>
+//           <div style={styles.modalBox}>
+//             <div style={styles.modalHeader}>
+//               <h3>Record Details</h3>
+//               <button
+//                 onClick={handleCloseViewModal}
+//                 style={styles.closeButton}
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+//             <table style={{ width: "100%", borderCollapse: "collapse" }}>
+//               <tbody>
+//                 {Object.entries(allFields).map(([key, label]) => (
+//                   <tr key={key} style={{ borderBottom: "1px solid #eee" }}>
+//                     <td
+//                       style={{ fontWeight: "600", padding: "8px", width: "40%" }}
+//                     >
+//                       {label}
+//                     </td>
+//                     <td style={{ padding: "8px" }}>
+//                       {key === "test_successful"
+//                         ? getTestSuccessfulBadge(viewRecord[key])
+//                         : formatFieldValue(viewRecord, key)}
+//                     </td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Manage Columns Modal */}
+//       {/* {showFieldSelector && (
+//         <div style={styles.modalOverlay}>
+//           <div style={styles.modalBox}>
+//             <div style={styles.modalHeader}>
+//               <h3>Manage Columns</h3>
+//               <button
+//                 onClick={() => setShowFieldSelector(false)}
+//                 style={styles.closeButton}
+//               >
+//                 <X size={20} />
+//               </button>
+//             </div>
+//             <div>
+//               {Object.entries(allFields).map(([key, label]) => (
+//                 <div key={key} style={{ marginBottom: "8px" }}>
+//                   <label>
+//                     <input
+//                       type="checkbox"
+//                       checked={selectedFields.includes(key)}
+//                       disabled={alwaysVisibleFields.includes(key)}
+//                       onChange={(e) => {
+//                         if (e.target.checked) {
+//                           setSelectedFields((prev) => [...prev, key])
+//                         } else {
+//                           setSelectedFields((prev) =>
+//                             prev.filter((f) => f !== key)
+//                           )
+//                         }
+//                       }}
+//                     />{" "}
+//                     {label}
+//                   </label>
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+//       )} */}
+
+//       {showFieldSelector && (
+//   <div style={styles.modalOverlay}>
+//     <div style={styles.fieldSelectorModal}>
+//       <div style={styles.modalHeader}>
+//         <h3>Customize Table Columns</h3>
+//         <button onClick={cancelFieldSelection} style={styles.closeButton}>
+//           <X size={20} />
+//         </button>
+//       </div>
+//       <div style={styles.fieldSelectorContent}>
+//         <p style={styles.instructionText}>
+//           Select up to 10 fields to display in the table ({tempSelectedFields.length}/10 selected)
+//         </p>
+//         <div style={styles.fieldGrid}>
+//           {Object.entries(allFields).map(([fieldKey, displayName]) => {
+//             const isAlwaysVisible = alwaysVisibleFields.includes(fieldKey)
+//             const isChecked = tempSelectedFields.includes(fieldKey)
+//             const isDisabled =
+//               isAlwaysVisible || (!isChecked && tempSelectedFields.length >= 10)
+//             return (
+//               <label
+//                 key={fieldKey}
+//                 style={{
+//                   ...styles.fieldCheckboxLabel,
+//                   backgroundColor: isChecked ? "#f0f9ff" : "white",
+//                   borderColor: isChecked ? "#3b82f6" : "#e5e7eb",
+//                   opacity: isDisabled && !isAlwaysVisible ? 0.5 : 1,
+//                   cursor:
+//                     isDisabled && !isAlwaysVisible ? "not-allowed" : "pointer",
+//                 }}
+//               >
+//                 <input
+//                   type="checkbox"
+//                   checked={isChecked}
+//                   onChange={() => handleFieldToggle(fieldKey)}
+//                   disabled={isDisabled}
+//                   style={styles.checkbox}
+//                 />
+//                 <span style={styles.fieldName}>
+//                   {displayName}
+//                   {isAlwaysVisible && (
+//                     <span
+//                       style={{
+//                         fontSize: "12px",
+//                         color: "#888",
+//                         marginLeft: "4px",
+//                       }}
+//                     >
+//                       (required)
+//                     </span>
+//                   )}
+//                 </span>
+//                 {isChecked && <Check size={16} style={styles.checkIcon} />}
+//               </label>
+//             )
+//           })}
+//         </div>
+//       </div>
+//       <div style={styles.modalFooter}>
+//         <button
+//           onClick={applyFieldSelection}
+//           style={{
+//             ...styles.applyButton,
+//             opacity: tempSelectedFields.length === 0 ? 0.5 : 1,
+//             cursor:
+//               tempSelectedFields.length === 0 ? "not-allowed" : "pointer",
+//           }}
+//           disabled={tempSelectedFields.length === 0}
+//         >
+//           Apply Changes
+//         </button>
+//         <button onClick={cancelFieldSelection} style={styles.cancelButton}>
+//           Cancel
+//         </button>
+//       </div>
+//     </div>
+//   </div>
+// )}
+
+//     </div>
+//   )
+// }
+
+
+
+
+
 "use client"
 
 import { useState, useEffect } from "react"
 import { Filter, Download, Share, Plus, Edit, ArrowLeft, Settings, X, Check, Eye } from "lucide-react"
 import EditWorkstream2Form from "../component/EditWorkstream2"
 import * as XLSX from "xlsx"
+import { useNavigate } from "react-router-dom"
 
-// Inline styles object
+// Inline styles
 const styles = {
   container: { minHeight: "100vh", backgroundColor: "#f9fafb" },
   main: { padding: "24px", maxWidth: "1400px", margin: "0 auto" },
@@ -841,27 +1862,17 @@ const styles = {
     cursor: "pointer",
     fontWeight: "500",
   },
-  primaryButton: { backgroundColor: "#3b82f6", color: "white", border: "1px solid #3b82f6" },
-  actionButtonDisabled: {
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
-    padding: "8px 16px",
-    border: "1px solid #d1d5db",
-    borderRadius: "6px",
-    backgroundColor: "#f9fafb",
-    color: "#9ca3af",
-    fontSize: "14px",
-    cursor: "not-allowed",
-    fontWeight: "500",
-    opacity: 0.6,
+  primaryButton: {
+    backgroundColor: "#3b82f6",
+    color: "white",
+    border: "1px solid #3b82f6",
   },
   table: {
     width: "100%",
     backgroundColor: "white",
     borderRadius: "8px",
     overflow: "hidden",
-    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+    boxShadow: "0 1px 3px 0 rgba(0,0,0,0.1)",
   },
   tableHeader: { backgroundColor: "#f9fafb" },
   tableHeaderCell: {
@@ -871,7 +1882,6 @@ const styles = {
     fontWeight: "500",
     color: "#374151",
     textTransform: "uppercase",
-    letterSpacing: "0.05em",
     borderBottom: "1px solid #e5e7eb",
   },
   tableRow: { borderBottom: "1px solid #f3f4f6" },
@@ -900,7 +1910,7 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -923,10 +1933,83 @@ const styles = {
     borderBottom: "1px solid #e5e7eb",
     paddingBottom: "10px",
   },
-  closeButton: { background: "transparent", border: "none", cursor: "pointer", padding: "4px" },
+  closeButton: {
+    background: "transparent",
+    border: "none",
+    cursor: "pointer",
+    padding: "4px",
+  },
+  fieldSelectorModal: {
+    backgroundColor: "white",
+    borderRadius: "8px",
+    padding: "24px",
+    maxWidth: "600px",
+    width: "90%",
+    maxHeight: "80vh",
+    overflow: "auto",
+  },
+  fieldSelectorContent: {
+    marginBottom: "20px",
+  },
+  instructionText: {
+    color: "#6b7280",
+    fontSize: "14px",
+    marginBottom: "16px",
+  },
+  fieldGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "12px",
+  },
+  fieldCheckboxLabel: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "8px 12px",
+    border: "1px solid #e5e7eb",
+    borderRadius: "6px",
+    cursor: "pointer",
+    transition: "background-color 0.2s",
+  },
+  checkbox: {
+    margin: 0,
+  },
+  fieldName: {
+    flex: 1,
+    fontSize: "14px",
+  },
+  checkIcon: {
+    color: "#10b981",
+  },
+  modalFooter: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gap: "12px",
+    borderTop: "1px solid #e5e7eb",
+    paddingTop: "16px",
+  },
+  applyButton: {
+    padding: "8px 16px",
+    backgroundColor: "#3b82f6",
+    color: "white",
+    border: "none",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: "500",
+  },
+  cancelButton: {
+    padding: "8px 16px",
+    backgroundColor: "white",
+    color: "#374151",
+    border: "1px solid #d1d5db",
+    borderRadius: "6px",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: "500",
+  },
 }
 
-// Badge colors
 const badgeVariants = {
   green: { backgroundColor: "#dcfce7", color: "#16a34a" },
   yellow: { backgroundColor: "#fef3c7", color: "#d97706" },
@@ -935,10 +2018,10 @@ const badgeVariants = {
 }
 
 export default function Workstream2Detail({ workstreamId = "02", onBack }) {
-  const [searchQuery, setSearchQuery] = useState("")
   const [workstreamData, setWorkstreamData] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+      const navigate = useNavigate()
 
   // Edit states
   const [editingRecordId, setEditingRecordId] = useState(null)
@@ -948,48 +2031,87 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
   const [showViewModal, setShowViewModal] = useState(false)
   const [viewRecord, setViewRecord] = useState(null)
 
+  const allFields = {
+    id: "ID",
+    case_no: "Case No",
+    account_number_masked: "Account Number Masked",
+    acquirer_country: "Acquirer Country",
+    acquirer_name: "Acquirer Name",
+    acquirer_region: "Acquirer Region",
+    acquiring_identifier: "Acquiring Identifier",
+    acquiring_identifier_legal_country: "Acquiring Identifier Legal Country",
+    acquiring_identifier_region: "Acquiring Identifier Region",
+    acquiring_user_bid: "Acquiring User BID",
+    auth_transaction_amount: "Auth Transaction Amount",
+    auth_transaction_count: "Auth Transaction Count",
+    billing_address: "Billing Address",
+    billing_name: "Billing Name",
+    billing_phone_number: "Billing Phone Number",
+    bypass_id_verification: "Bypass ID Verification",
+    card_acceptor_id: "Card Acceptor ID",
+    card_acceptor_terminal_id: "Card Acceptor Terminal ID",
+    card_country: "Card Country",
+    card_no: "Card No",
+    comments: "Comments",
+    created_at: "Created At",
+    cvv: "CVV",
+    declined_message: "Declined Message",
+    eci_moto_group_code: "ECI MOTO Group Code",
+    email: "Email",
+    enriched_merchant_category: "Enriched Merchant Category",
+    enriched_pos_entry_mode: "Enriched POS Entry Mode",
+    expiry_date: "Expiry Date",
+    id_verification_required: "ID Verification Required",
+    log_generated: "Log Generated",
+    merchant_category_code: "Merchant Category Code",
+    merchant_city: "Merchant City",
+    merchant_country: "Merchant Country",
+    merchant_country_code: "Merchant Country Code",
+    merchant_name: "Merchant Name",
+    merchant_name_acceptor: "Merchant Name Acceptor",
+    merchant_state: "Merchant State",
+    merchant_state_code: "Merchant State Code",
+    metrics: "Metrics",
+    not_tested_breakup: "Not Tested Breakup",
+    pos_condition: "POS Condition",
+    pos_condition_code: "POS Condition Code",
+    pos_entry_mode: "POS Entry Mode",
+    test_successful: "Test Successful",
+    tested_amount: "Tested Amount",
+    tested_currency: "Tested Currency",
+    tested_on_date: "Tested On Date",
+    tested_product: "Tested Product",
+    tested_url: "Tested URL",
+    tested_url_homepage: "Tested URL Homepage",
+    transaction_amount_usd: "Transaction Amount USD",
+    transaction_currency_code: "Transaction Currency Code",
+    transaction_gmt_date: "Transaction GMT Date",
+    transaction_identifier: "Transaction Identifier",
+    violation_tested_product: "Violation Tested Product",
+  }
+
   // Column customization
-  const [showFieldSelector, setShowFieldSelector] = useState(false)
   const [selectedFields, setSelectedFields] = useState([
     "case_no",
     "test_successful",
+    "billing_name",
     "card_no",
     "card_country",
-    "expiry_date",
     "email",
     "tested_on_date",
+    "tested_amount",
   ])
-  const [tempSelectedFields, setTempSelectedFields] = useState([])
+
+  const [showFieldSelector, setShowFieldSelector] = useState(false)
+  const [tempSelectedFields, setTempSelectedFields] = useState(selectedFields)
   const alwaysVisibleFields = ["case_no", "test_successful"]
 
-  const allFields = {
-    case_no: "Case No.",
-    test_successful: "Test Successful",
-    card_no: "Card No",
-    card_country: "Card Country",
-    expiry_date: "Expiry Date",
-    cvv: "CVV",
-    email: "Email",
-    tested_url_homepage: "Tested URL Homepage",
-    tested_url: "Tested URL",
-    tested_on_date: "Tested on Date",
-    tested_amount: "Tested Amount",
-    tested_currency: "Tested Currency",
-    billing_address: "Billing Address",
-    billing_phone_number: "Billing Phone Number",
-    billing_name: "Billing Name",
-    declined_message: "Declined Message",
-    not_tested_breakup: "Not Tested Breakup",
-    comments: "Comments",
-    id_verification_required: "ID Verification Required",
-    bypass_id_verification: "Bypass ID Verification",
-    violation_tested_product: "Violation Tested Product",
-    merchant_name: "Merchant Name",
-    log_generated: "Log Generated Y/N",
-    created_at: "Created At",
+  
+   const handleAddNew = () => {
+    navigate("/new-record")   // 👉 replace with your actual Add New route
   }
 
-  // Fetch workstream2 data
+  // Fetch data
   const fetchWorkstreamData = async () => {
     try {
       setLoading(true)
@@ -1009,11 +2131,12 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
       setLoading(false)
     }
   }
+
   useEffect(() => {
     fetchWorkstreamData()
   }, [workstreamId])
 
-  // --- Edit ---
+  // Edit
   const handleEditRecord = (recordId) => {
     setEditingRecordId(recordId)
     setShowEditForm(true)
@@ -1023,11 +2146,10 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
     setEditingRecordId(null)
     fetchWorkstreamData()
   }
-  const handleSaveRecord = (updatedRecord) => {
-    setWorkstreamData((prev) => prev.map((r) => (r.case_no === updatedRecord.case_no ? updatedRecord : r)))
-  }
 
-  // --- View ---
+
+
+  // View
   const handleViewRecord = (record) => {
     setViewRecord(record)
     setShowViewModal(true)
@@ -1037,7 +2159,86 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
     setShowViewModal(false)
   }
 
-  // Format field value
+  // Field Selector
+  const handleFieldToggle = (fieldKey) => {
+    if (alwaysVisibleFields.includes(fieldKey)) return
+    setTempSelectedFields((prev) => {
+      if (prev.includes(fieldKey)) {
+        return prev.filter((f) => f !== fieldKey)
+      } else if (prev.length < 10) {
+        return [...prev, fieldKey]
+      }
+      return prev
+    })
+  }
+
+  const applyFieldSelection = () => {
+    if (tempSelectedFields.length === 0) {
+      alert("Please select at least one field to display.")
+      return
+    }
+    const finalFields = Array.from(new Set([...alwaysVisibleFields, ...tempSelectedFields]))
+    setSelectedFields(finalFields)
+    setShowFieldSelector(false)
+  }
+
+  const cancelFieldSelection = () => {
+    setTempSelectedFields([])
+    setShowFieldSelector(false)
+  }
+
+  // Export All
+  const exportToCSV = () => {
+    try {
+      const exportData = workstreamData.map((record) => {
+        const exportRecord = {}
+        Object.keys(allFields).forEach((fieldKey) => {
+          const displayName = allFields[fieldKey]
+          // Include all fields, even null values, so users can update them in CSV
+          exportRecord[displayName] = record[fieldKey] || ""
+        })
+        return exportRecord
+      })
+      const worksheet = XLSX.utils.json_to_sheet(exportData)
+      const csv = XLSX.utils.sheet_to_csv(worksheet)
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      const currentDate = new Date().toISOString().split("T")[0]
+      link.download = `Workstream2_All_Fields_${currentDate}.csv`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("CSV export failed:", error)
+      alert("CSV export failed. Please try again.")
+    }
+  }
+
+  const exportRowToCSV = (record) => {
+    try {
+      const exportRecord = {}
+      Object.keys(allFields).forEach((fieldKey) => {
+        const displayName = allFields[fieldKey]
+        exportRecord[displayName] = record[fieldKey] || ""
+      })
+      const worksheet = XLSX.utils.json_to_sheet([exportRecord])
+      const csv = XLSX.utils.sheet_to_csv(worksheet)
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      const currentDate = new Date().toISOString().split("T")[0]
+      link.download = `Workstream2_Case_${record.case_no}_${currentDate}.csv`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("Row CSV export failed:", error)
+      alert("Row CSV export failed. Please try again.")
+    }
+  }
+
+  // Format values
   const formatFieldValue = (item, fieldKey) => {
     const value = item[fieldKey]
     switch (fieldKey) {
@@ -1046,14 +2247,18 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
       case "created_at":
         return value ? value.split("T")[0] : "N/A"
       case "tested_amount":
-        return value ? `$${parseFloat(value).toFixed(2)}` : "N/A"
+        return value ? `${Number.parseFloat(value).toFixed(2)} ${item.tested_currency || ""}` : "N/A"
       case "card_no":
         return value ? `****-****-****-${value.toString().slice(-4)}` : "N/A"
       case "cvv":
         return value ? "***" : "N/A"
       case "billing_address":
       case "not_tested_breakup":
-        return value ? (value.length > 50 ? `${value.substring(0, 50)}...` : value) : "N/A"
+      case "tested_url":
+      case "tested_url_homepage":
+        return value && value.length > 50 ? `${value.substring(0, 50)}...` : value || "N/A"
+      case "billing_phone_number":
+        return value ? `****-***-${value.toString().slice(-4)}` : "N/A"
       default:
         return value || "N/A"
     }
@@ -1077,16 +2282,9 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
     }
   }
 
-  const filteredData = workstreamData.filter(
-    (record) =>
-      (record.merchant_name && record.merchant_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (record.card_country && record.card_country.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (record.email && record.email.toLowerCase().includes(searchQuery.toLowerCase())),
-  )
-
-  // Show edit form
-  if (showEditForm && editingRecordId) {
-    return <EditWorkstream2Form recordId={editingRecordId} onBack={handleBackToList} onSave={handleSaveRecord} />
+  // Show Edit Form
+  if (showEditForm) {
+    return <EditWorkstream2Form recordId={editingRecordId} onBack={handleBackToList} />
   }
 
   return (
@@ -1097,12 +2295,29 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
           <ArrowLeft size={16} /> Back to Dashboard
         </button>
 
-        {/* Page Header */}
+        {/* Header with actions */}
         <div style={styles.pageHeader}>
           <h1 style={styles.pageTitle}>Workstream {workstreamId} - Payment Testing</h1>
+          <div style={styles.actionButtons}>
+            {/* <button style={styles.actionButton}>
+              <Filter size={16} /> Filter
+            </button> */}
+            <button style={styles.actionButton} onClick={() => setShowFieldSelector(true)}>
+              <Settings size={16} /> Manage Columns ({selectedFields.length}/10)
+            </button>
+            <button style={styles.actionButton} onClick={exportToCSV}>
+              <Download size={16} /> Export
+            </button>
+            <button style={styles.actionButton}>
+              <Share size={16} /> Share
+            </button>
+            <button style={{ ...styles.actionButton, ...styles.primaryButton }} onClick={handleAddNew}>
+              <Plus size={16} /> Add New
+            </button>
+          </div>
         </div>
 
-        {/* Data Table */}
+        {/* Table */}
         <div style={styles.table}>
           {loading ? (
             <div style={{ padding: "40px", textAlign: "center" }}>Loading...</div>
@@ -1121,14 +2336,14 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
                 </tr>
               </thead>
               <tbody>
-                {filteredData.length === 0 ? (
+                {workstreamData.length === 0 ? (
                   <tr>
                     <td colSpan={selectedFields.length + 1} style={{ textAlign: "center", padding: "20px" }}>
                       No data
                     </td>
                   </tr>
                 ) : (
-                  filteredData.map((record) => (
+                  workstreamData.map((record) => (
                     <tr key={record.case_no} style={styles.tableRow}>
                       {selectedFields.map((f) => (
                         <td key={f} style={styles.tableCell}>
@@ -1140,14 +2355,10 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
                           <button style={styles.button} onClick={() => handleViewRecord(record)} title="View">
                             <Eye size={16} />
                           </button>
-                          <button style={styles.button} onClick={() => handleEditRecord(record.case_no)} title="Edit">
+                          <button style={styles.button} onClick={() => handleEditRecord(record.id)} title="Edit">
                             <Edit size={16} />
                           </button>
-                          <button
-                            style={styles.button}
-                            onClick={() => handleSingleRecordExport(record.case_no)}
-                            title="Download"
-                          >
+                          <button style={styles.button} onClick={() => exportRowToCSV(record)} title="Download CSV">
                             <Download size={16} />
                           </button>
                         </div>
@@ -1188,7 +2399,75 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
           </div>
         </div>
       )}
+
+      {/* Manage Columns Modal */}
+      {showFieldSelector && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.fieldSelectorModal}>
+            <div style={styles.modalHeader}>
+              <h3>Customize Table Columns</h3>
+              <button onClick={cancelFieldSelection} style={styles.closeButton}>
+                <X size={20} />
+              </button>
+            </div>
+            <div style={styles.fieldSelectorContent}>
+              <p style={styles.instructionText}>
+                Select up to 10 fields to display in the table ({tempSelectedFields.length}/10 selected)
+              </p>
+              <div style={styles.fieldGrid}>
+                {Object.entries(allFields).map(([fieldKey, displayName]) => {
+                  const isAlwaysVisible = alwaysVisibleFields.includes(fieldKey)
+                  const isChecked = tempSelectedFields.includes(fieldKey)
+                  const isDisabled = isAlwaysVisible || (!isChecked && tempSelectedFields.length >= 10)
+                  return (
+                    <label
+                      key={fieldKey}
+                      style={{
+                        ...styles.fieldCheckboxLabel,
+                        backgroundColor: isChecked ? "#f0f9ff" : "white",
+                        borderColor: isChecked ? "#3b82f6" : "#e5e7eb",
+                        opacity: isDisabled && !isAlwaysVisible ? 0.5 : 1,
+                        cursor: isDisabled && !isAlwaysVisible ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => handleFieldToggle(fieldKey)}
+                        disabled={isDisabled}
+                        style={styles.checkbox}
+                      />
+                      <span style={styles.fieldName}>
+                        {displayName}
+                        {isAlwaysVisible && (
+                          <span style={{ fontSize: "12px", color: "#888", marginLeft: "4px" }}>(required)</span>
+                        )}
+                      </span>
+                      {isChecked && <Check size={16} style={styles.checkIcon} />}
+                    </label>
+                  )
+                })}
+              </div>
+            </div>
+            <div style={styles.modalFooter}>
+              <button
+                onClick={applyFieldSelection}
+                style={{
+                  ...styles.applyButton,
+                  opacity: tempSelectedFields.length === 0 ? 0.5 : 1,
+                  cursor: tempSelectedFields.length === 0 ? "not-allowed" : "pointer",
+                }}
+                disabled={tempSelectedFields.length === 0}
+              >
+                Apply Changes
+              </button>
+              <button onClick={cancelFieldSelection} style={styles.cancelButton}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
-

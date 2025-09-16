@@ -805,58 +805,114 @@ export default function EditWorkstream2Form({ recordId, onBack, onSave }) {
     fetchRecordData()
   }, [recordId])
 
+  // const fetchRecordData = async () => {
+  //   try {
+  //     setLoading(true)
+
+  //     // Fetch record by ID using the new endpoint
+  //     const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record-by-id/${recordId}`)
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`)
+  //     }
+  //     const result = await response.json()
+
+  //     if (result?.data && result.data.length > 0) {
+  //       const record = result.data[0]
+
+  //       // Map database fields to form fields
+  //       setFormData({
+  //         caseNo: record.case_no || "",
+  //         testSuccessful: record.test_successful || "",
+  //         cardNo: record.card_no || "",
+  //         cardCountry: record.card_country || "",
+  //         expiryDate: record.expiry_date ? formatExpiryDate(record.expiry_date) : "",
+  //         cvv: record.cvv || "",
+  //         email: record.email || "",
+  //         testedUrlHomepage: record.tested_url_homepage || "",
+  //         testedUrl: record.tested_url || "",
+  //         testedOnDate: record.tested_on_date ? record.tested_on_date.split("T")[0] : "",
+  //         testedAmount: record.tested_amount || "",
+  //         testedCurrency: record.tested_currency || "INR",
+  //         billingAddress: record.billing_address || "",
+  //         billingPhoneNumber: record.billing_phone_number || "",
+  //         billingName: record.billing_name || "",
+  //         declinedMessage: record.declined_message || "",
+  //         comments: record.comments || "",
+  //         notTestedBreakup: record.not_tested_breakup || "",
+  //         idVerificationRequired: record.id_verification_required || "",
+  //         bypassIdVerification: record.bypass_id_verification || "",
+  //         violationTestedProduct: record.violation_tested_product || "",
+  //         testedProduct: record.tested_product || "",
+  //         merchantName: record.merchant_name || "",
+  //         logGenerated: record.log_generated || "",
+  //       })
+  //       setError(null)
+  //     } else {
+  //       setError("Record not found")
+  //     }
+  //   } catch (err) {
+  //     console.error("Error fetching record:", err)
+  //     setError(`Failed to load record: ${err.message}`)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
+
+
   const fetchRecordData = async () => {
-    try {
-      setLoading(true)
+  try {
+    setLoading(true);
 
-      // Fetch record by ID using the new endpoint
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record-by-id/${recordId}`)
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const result = await response.json()
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/open/workstream2-record-by-id/${recordId}`
+    );
 
-      if (result?.data && result.data.length > 0) {
-        const record = result.data[0]
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-        // Map database fields to form fields
-        setFormData({
-          caseNo: record.case_no || "",
-          testSuccessful: record.test_successful || "",
-          cardNo: record.card_no || "",
-          cardCountry: record.card_country || "",
-          expiryDate: record.expiry_date ? formatExpiryDate(record.expiry_date) : "",
-          cvv: record.cvv || "",
-          email: record.email || "",
-          testedUrlHomepage: record.tested_url_homepage || "",
-          testedUrl: record.tested_url || "",
-          testedOnDate: record.tested_on_date ? record.tested_on_date.split("T")[0] : "",
-          testedAmount: record.tested_amount || "",
-          testedCurrency: record.tested_currency || "INR",
-          billingAddress: record.billing_address || "",
-          billingPhoneNumber: record.billing_phone_number || "",
-          billingName: record.billing_name || "",
-          declinedMessage: record.declined_message || "",
-          comments: record.comments || "",
-          notTestedBreakup: record.not_tested_breakup || "",
-          idVerificationRequired: record.id_verification_required || "",
-          bypassIdVerification: record.bypass_id_verification || "",
-          violationTestedProduct: record.violation_tested_product || "",
-          testedProduct: record.tested_product || "",
-          merchantName: record.merchant_name || "",
-          logGenerated: record.log_generated || "",
-        })
-        setError(null)
-      } else {
-        setError("Record not found")
-      }
-    } catch (err) {
-      console.error("Error fetching record:", err)
-      setError(`Failed to load record: ${err.message}`)
-    } finally {
-      setLoading(false)
+    const result = await response.json();
+    console.log("🔍 API response:", result);
+
+    if (result?.data && result.data.length > 0) {
+      const record = result.data[0]; // ✅ take first row
+
+      setFormData({
+        caseNo: record.case_no || "",
+        testSuccessful: record.test_successful || "",
+        cardNo: record.card_no || "",
+        cardCountry: record.card_country || "",
+        expiryDate: record.expiry_date ? formatExpiryDate(record.expiry_date) : "",
+        cvv: record.cvv || "",
+        email: record.email || "",
+        testedUrlHomepage: record.tested_url_homepage || "",
+        testedUrl: record.tested_url || "",
+        testedOnDate: record.tested_on_date ? record.tested_on_date.split("T")[0] : "",
+        testedAmount: record.tested_amount || "",
+        testedCurrency: record.tested_currency || "INR",
+        billingAddress: record.billing_address || "",
+        billingPhoneNumber: record.billing_phone_number || "",
+        billingName: record.billing_name || "",
+        declinedMessage: record.declined_message || "",
+        comments: record.comments || "",
+        notTestedBreakup: record.not_tested_breakup || "",
+        idVerificationRequired: record.id_verification_required || "",
+        bypassIdVerification: record.bypass_id_verification || "",
+        violationTestedProduct: record.violation_tested_product || "",
+        testedProduct: record.tested_product || "",
+        merchantName: record.merchant_name || "",
+        logGenerated: record.log_generated || "",
+      });
+      setError(null);
+    } else {
+      setError("Record not found");
     }
+  } catch (err) {
+    console.error("❌ Error fetching record:", err);
+    setError(`Failed to load record: ${err.message}`);
+  } finally {
+    setLoading(false);
   }
+};
+
 
   const formatExpiryDate = (dateString) => {
     if (!dateString) return ""
@@ -1007,7 +1063,7 @@ export default function EditWorkstream2Form({ recordId, onBack, onSave }) {
   }
 
   return (
-    <div className="form-container">
+    <div className="form-container-edit">
       {/* Main Form */}
       <div className="form-content">
         <button

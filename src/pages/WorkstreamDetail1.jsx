@@ -907,6 +907,7 @@ import { useState, useEffect } from "react"
 import { Filter, Download, Share, Plus, Edit, ArrowLeft, Settings, X, Check, Eye } from "lucide-react"
 import EditReviewerForm from "../component/EditWorkstream1"
 import * as XLSX from "xlsx"
+import { useNavigate } from "react-router-dom"
 
 // ... your existing styles (unchanged)
 
@@ -1241,6 +1242,7 @@ export default function WorkstreamDetail({ workstreamId = "01", onBack }) {
   const [tempSelectedFields, setTempSelectedFields] = useState([])
 
   const alwaysVisibleFields = ["id", "accessibility"]
+    const navigate = useNavigate()
 
   const allFields = {
     id: "ID",
@@ -1262,6 +1264,12 @@ export default function WorkstreamDetail({ workstreamId = "01", onBack }) {
     a_checks: "A-Checks",
     created_at: "Created At",
   }
+
+
+   const handleAddNew = () => {
+    navigate("/new-record")   // 👉 replace with your actual Add New route
+  }
+
 
   // Fetch workstream data
   const fetchWorkstreamData = async () => {
@@ -1314,32 +1322,178 @@ export default function WorkstreamDetail({ workstreamId = "01", onBack }) {
     setViewRecord(null)
   }
 
-  // Formatters
-  const formatFieldValue = (item, fieldKey) => {
-    const value = item[fieldKey]
-    switch (fieldKey) {
-      case "review_date":
-      case "created_at":
-      case "calculated_friday":
-        return value ? value.split("T")[0] : "N/A"
-      case "images":
-        try {
-          const images = typeof value === "string" ? JSON.parse(value) : value
-          return Array.isArray(images) ? images.length : 0
-        } catch {
-          return 0
-        }
-      case "a_checks":
-        try {
-          const checks = typeof value === "string" ? JSON.parse(value) : value
-          return Array.isArray(checks) ? `${checks.filter((c) => c.checked).length}/${checks.length}` : "0/0"
-        } catch {
-          return "0/0"
-        }
-      default:
-        return value || "N/A"
+
+  const openFieldSelector = () => {
+  setTempSelectedFields([...selectedFields])
+  setShowFieldSelector(true)
+}
+
+const handleFieldToggle = (fieldKey) => {
+  if (alwaysVisibleFields.includes(fieldKey)) return
+  setTempSelectedFields((prev) => {
+    if (prev.includes(fieldKey)) {
+      return prev.filter((f) => f !== fieldKey)
+    } else if (prev.length < 10) {
+      return [...prev, fieldKey]
     }
+    return prev
+  })
+}
+
+const applyFieldSelection = () => {
+  if (tempSelectedFields.length === 0) {
+    alert("Please select at least one field to display.")
+    return
   }
+  const finalFields = Array.from(new Set([...alwaysVisibleFields, ...tempSelectedFields]))
+  setSelectedFields(finalFields)
+  setShowFieldSelector(false)
+}
+
+const cancelFieldSelection = () => {
+  setTempSelectedFields([])
+  setShowFieldSelector(false)
+}
+
+const formatFieldValue = (item, fieldKey) => {
+  const value = item[fieldKey]
+  switch (fieldKey) {
+    case "review_date":
+    case "created_at":
+    case "calculated_friday":
+      return value ? value.split("T")[0] : "N/A"
+    case "images":
+      try {
+        const images = typeof value === "string" ? JSON.parse(value) : value
+        return Array.isArray(images) ? images.length : 0
+      } catch {
+        return 0
+      }
+    case "a_checks":
+      try {
+        const checks = typeof value === "string" ? JSON.parse(value) : value
+        return Array.isArray(checks) ? `${checks.filter((c) => c.checked).length}/${checks.length}` : "0/0"
+      } catch {
+        return "0/0"
+      }
+    default:
+      return value || "N/A"
+  }
+}
+
+// const exportToExcel = () => {
+//   try {
+//     const exportData = filteredData.map((record) => {
+//       const exportRecord = {}
+//       selectedFields.forEach((fieldKey) => {
+//         const displayName = allFields[fieldKey]
+//         exportRecord[displayName] =
+//           fieldKey === "accessibility" ? record[fieldKey] || "N/A" : formatFieldValue(record, fieldKey)
+//       })
+//       return exportRecord
+//     })
+//     const workbook = XLSX.utils.book_new()
+//     const worksheet = XLSX.utils.json_to_sheet(exportData)
+//     const columnWidths = selectedFields.map((fieldKey) => {
+//       const displayName = allFields[fieldKey]
+//       return { wch: Math.max(displayName.length, 15) }
+//     })
+//     worksheet["!cols"] = columnWidths
+//     XLSX.utils.book_append_sheet(workbook, worksheet, "Workstream")
+//     const currentDate = new Date().toISOString().split("T")[0]
+//     XLSX.writeFile(workbook, `Workstream_${currentDate}.xlsx`)
+//   } catch (error) {
+//     console.error("Export failed:", error)
+//     alert("Export failed. Please try again.")
+//   }
+// }
+
+
+  // // Formatters
+  // const formatFieldValue = (item, fieldKey) => {
+  //   const value = item[fieldKey]
+  //   switch (fieldKey) {
+  //     case "review_date":
+  //     case "created_at":
+  //     case "calculated_friday":
+  //       return value ? value.split("T")[0] : "N/A"
+  //     case "images":
+  //       try {
+  //         const images = typeof value === "string" ? JSON.parse(value) : value
+  //         return Array.isArray(images) ? images.length : 0
+  //       } catch {
+  //         return 0
+  //       }
+  //     case "a_checks":
+  //       try {
+  //         const checks = typeof value === "string" ? JSON.parse(value) : value
+  //         return Array.isArray(checks) ? `${checks.filter((c) => c.checked).length}/${checks.length}` : "0/0"
+  //       } catch {
+  //         return "0/0"
+  //       }
+  //     default:
+  //       return value || "N/A"
+  //   }
+  // }
+
+  const exportToCSV = () => {
+  try {
+    const exportData = filteredData.map((record) => {
+      const exportRecord = {}
+    Object.keys(allFields).forEach((fieldKey) => {
+
+        const displayName = allFields[fieldKey]
+        exportRecord[displayName] =
+          fieldKey === "accessibility" ? record[fieldKey] || "N/A" : formatFieldValue(record, fieldKey)
+      })
+      return exportRecord
+    })
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData)
+    const csv = XLSX.utils.sheet_to_csv(worksheet)
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    const currentDate = new Date().toISOString().split("T")[0]
+    link.download = `Workstream_${currentDate}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error("CSV export failed:", error)
+    alert("CSV export failed. Please try again.")
+  }
+}
+
+const handleSingleRecordExport = (recordId) => {
+  try {
+    const record = workstreamData.find((r) => r.id === recordId)
+    if (!record) return
+
+    // Export ALL fields, not just selectedFields
+    const exportRecord = {}
+    Object.keys(allFields).forEach((fieldKey) => {
+      const displayName = allFields[fieldKey]
+      exportRecord[displayName] =
+        fieldKey === "accessibility" ? record[fieldKey] || "N/A" : formatFieldValue(record, fieldKey)
+    })
+
+    const worksheet = XLSX.utils.json_to_sheet([exportRecord])
+    const csv = XLSX.utils.sheet_to_csv(worksheet)
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `Workstream_Record_${recordId}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error("Single record CSV export failed:", error)
+    alert("Failed to export record.")
+  }
+}
+
+
 
   const getAccessibilityBadge = (level) => {
     const badgeStyle = { ...styles.badge }
@@ -1370,8 +1524,38 @@ export default function WorkstreamDetail({ workstreamId = "01", onBack }) {
       <main style={styles.main}>
         {/* Back Button */}
         <button style={styles.backButton} onClick={onBack}>
-          <ArrowLeft size={16} /> Back to Dashboard
+          <ArrowLeft size={16} /> Back to Dashboard 1
         </button>
+        <div style={styles.pageHeader}>
+  <h1 style={styles.pageTitle}>Workstream</h1>
+  <div style={styles.actionButtons}>
+    {/* <button style={styles.actionButton}>
+      <Filter size={16} />
+      Filter
+    </button> */}
+    <button style={styles.actionButton} onClick={openFieldSelector}>
+      <Settings size={16} />
+      Manage Columns ({selectedFields.length}/10)
+    </button>
+    <button
+      style={loading || filteredData.length === 0 ? styles.actionButtonDisabled : styles.actionButton}
+      onClick={exportToCSV}
+      disabled={loading || filteredData.length === 0}
+    >
+      <Download size={16} />
+      Export
+    </button>
+    <button style={styles.actionButton}>
+      <Share size={16} />
+      Share
+    </button>
+    <button style={{ ...styles.actionButton, ...styles.primaryButton }}  onClick={handleAddNew} >
+      <Plus size={16} />
+      Add New
+    </button>
+  </div>
+</div>
+
 
         {/* Table */}
         <div style={styles.table}>
@@ -1469,6 +1653,77 @@ export default function WorkstreamDetail({ workstreamId = "01", onBack }) {
           </div>
         </div>
       )}
+
+      {showFieldSelector && (
+  <div style={styles.modalOverlay}>
+    <div style={styles.fieldSelectorModal}>
+      <div style={styles.modalHeader}>
+        <h3>Customize Table Columns</h3>
+        <button onClick={cancelFieldSelection} style={styles.closeButton}>
+          <X size={20} />
+        </button>
+      </div>
+      <div style={styles.fieldSelectorContent}>
+        <p style={styles.instructionText}>
+          Select up to 10 fields to display in the table ({tempSelectedFields.length}/10 selected)
+        </p>
+        <div style={styles.fieldGrid}>
+          {Object.entries(allFields).map(([fieldKey, displayName]) => {
+            const isAlwaysVisible = alwaysVisibleFields.includes(fieldKey)
+            const isChecked = tempSelectedFields.includes(fieldKey)
+            const isDisabled = isAlwaysVisible || (!isChecked && tempSelectedFields.length >= 10)
+            return (
+              <label
+                key={fieldKey}
+                style={{
+                  ...styles.fieldCheckboxLabel,
+                  backgroundColor: isChecked ? "#f0f9ff" : "white",
+                  borderColor: isChecked ? "#3b82f6" : "#e5e7eb",
+                  opacity: isDisabled && !isAlwaysVisible ? 0.5 : 1,
+                  cursor: isDisabled && !isAlwaysVisible ? "not-allowed" : "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={isChecked}
+                  onChange={() => handleFieldToggle(fieldKey)}
+                  disabled={isDisabled}
+                  style={styles.checkbox}
+                />
+                <span style={styles.fieldName}>
+                  {displayName}
+                  {isAlwaysVisible && (
+                    <span style={{ fontSize: "12px", color: "#888", marginLeft: "4px" }}>
+                      (required)
+                    </span>
+                  )}
+                </span>
+                {isChecked && <Check size={16} style={styles.checkIcon} />}
+              </label>
+            )
+          })}
+        </div>
+      </div>
+      <div style={styles.modalFooter}>
+        <button
+          onClick={applyFieldSelection}
+          style={{
+            ...styles.applyButton,
+            opacity: tempSelectedFields.length === 0 ? 0.5 : 1,
+            cursor: tempSelectedFields.length === 0 ? "not-allowed" : "pointer",
+          }}
+          disabled={tempSelectedFields.length === 0}
+        >
+          Apply Changes
+        </button>
+        <button onClick={cancelFieldSelection} style={styles.cancelButton}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   )
 }

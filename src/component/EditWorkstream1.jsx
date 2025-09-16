@@ -1589,7 +1589,7 @@ export default function EditReviewerForm({ recordId, onBack, onSave }) {
   }
 
   return (
-    <div className="form-container">
+    <div className="form-container-edit">
       {/* Back Button */}
       <button
         onClick={onBack}

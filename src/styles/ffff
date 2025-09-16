@@ -1,20 +1,12 @@
-.form-containers {
-
-  margin: 0 auto;
-
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #f8f9fa;
-  min-height: 100vh;
-}
 .form-container {
-
+  max-width: 1400px;
   margin: 0 auto;
-
+  padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: #f8f9fa;
   min-height: 100vh;
- 
 }
+
 .workstream-tabs {
   display: flex;
   gap: 10px;
@@ -43,14 +35,19 @@
   box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
 
-
+.form-content {
+  /* Removed all container styling to eliminate grey outline */
+  /* background: white; */
+  /* border-radius: 12px; */
+  /* padding: 40px; */
+}
 
 .form-title {
   font-size: 24px;
   font-weight: 600;
   color: #333;
   margin-bottom: 30px;
-  text-align: left;
+  text-align: center;
 }
 
 .section-title {
@@ -196,8 +193,6 @@
 }
 
 .submit-button {
-    margin: 20px auto;   /* 🔥 This centers horizontally */
-  display: block;   
   background: linear-gradient(135deg, #007bff, #0056b3);
   color: white;
   border: none;
@@ -279,6 +274,7 @@
 }
 
 .conditional-field {
+  border: 2px solid #e9ecef;
   border-radius: 12px;
   padding: 20px;
   background: #f8f9fa;
@@ -375,6 +371,7 @@
 
 .image-preview-card {
   position: relative;
+  border: 2px solid #e9ecef;
   border-radius: 12px;
   overflow: hidden;
   background: white;
@@ -385,6 +382,7 @@
 .image-preview-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border-color: #007bff;
 }
 
 .preview-image {
@@ -637,29 +635,4 @@
   .image-card-info {
     padding: 8px;
   }
-}
-
-
-.form-row {
-  display: flex;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.form-row .form-group {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.form-row.single .form-group {
-  flex: 100%;
-}
-.form-container-edit{
-    margin: 0 auto;
-padding:25px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #f8f9fa;
-  min-height: 100vh;
-
 }
