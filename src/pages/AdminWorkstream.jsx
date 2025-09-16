@@ -2905,7 +2905,7 @@ const WorkstreamPage = () => {
                 </div>
               ))}
 
-            <div className="workstream-card add-card">
+            {/* <div className="workstream-card add-card">
               <button
                 onClick={() => setShowModal(true)}
                 style={{
@@ -2919,7 +2919,7 @@ const WorkstreamPage = () => {
               >
                 + Add Workstream
               </button>
-            </div>
+            </div> */}
           </div>
 
           <div
