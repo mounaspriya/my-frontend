@@ -2171,13 +2171,17 @@ export default function DashboardView() {
                 <table style={{ width: "100%" }}>
                   <thead style={styles.tableHeader}>
                     <tr>
-                      <th style={styles.tableHeaderCell}>ID</th>
+                     
                       <th style={styles.tableHeaderCell}>Workstream</th>
+                       <th style={styles.tableHeaderCell}>Date/Time Submitted</th>
+                        <th style={styles.tableHeaderCell}>Submitted By</th>
                       <th style={styles.tableHeaderCell}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
+              {      console.log(recentRecordsData,"recentRecordsData")}
                     {recentRecordsData.length === 0 ? (
+                      
                       <tr>
                         <td colSpan="9" style={{ ...styles.tableCell, textAlign: "center", color: "#6b7280" }}>
                           No workstream data available
@@ -2187,12 +2191,14 @@ export default function DashboardView() {
                       recentRecordsData.map((record) => (
                         <tr key={`${record.id}-${record.createdAt}`} style={styles.tableRow}>
                           {/* ID */}
-                          <td style={styles.tableCell}>{record.id || "N/A"}</td>
+                         
 
                           {/* Workstream */}
                           <td style={styles.tableCell}>
                             {`Workstream ${record.workstreamId === 5 ? 3 : record.workstreamId}`}
                           </td>
+                           <td style={styles.tableCell}>{record.createdAt || "N/A"}</td>
+                            <td style={styles.tableCell}>Viewer</td>
                           {/* Edit button */}
                           <td style={styles.tableCell}>
                             <button
