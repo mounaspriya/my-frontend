@@ -108,10 +108,276 @@
 
 
 
+// "use client"
+
+// import { useState, useEffect } from "react"
+// import { ArrowLeft, Save } from "lucide-react"
+// import "../styles/Form.css"
+
+// export default function EditWorkstream3({ recordId, onBack, onSave }) {
+//   const [formSchema, setFormSchema] = useState([])
+//   const [formData, setFormData] = useState({})
+//   const [loading, setLoading] = useState(true)
+//   const [isSaving, setIsSaving] = useState(false)
+
+//   useEffect(() => {
+//     fetchFormSchema()
+//   }, [])
+
+//   useEffect(() => {
+//     if (formSchema.length > 0) {
+//       fetchRecord()
+//     }
+//   }, [formSchema, recordId])
+
+//   // ✅ Fetch schema
+//   const fetchFormSchema = async () => {
+//     try {
+//       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/workstream3/field-config`)
+//       const data = await res.json()
+//       if (data.success) {
+//         setFormSchema(data.data)
+//       }
+//     } catch (err) {
+//       console.error("Error fetching schema:", err)
+//     }
+//   }
+
+//   // ✅ Fetch record by ID
+//   const fetchRecord = async () => {
+//     try {
+//       setLoading(true)
+//       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream3/${recordId}`)
+//       const data = await res.json()
+//       if (data.success) {
+//         const parsed =
+//           typeof data.data.submission === "string"
+//             ? JSON.parse(data.data.submission)
+//             : data.data.submission
+//         setFormData(parsed)
+//       }
+//     } catch (err) {
+//       console.error("Error fetching record:", err)
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+
+//   // ✅ Input handlers
+//   const handleInputChange = (fieldLabel, value) => {
+//     setFormData((prev) => ({ ...prev, [fieldLabel]: value }))
+//   }
+
+//   const handleCheckboxGroupChange = (fieldLabel, optionValue, checked) => {
+//     setFormData((prev) => {
+//       const currentValues = prev[fieldLabel] || []
+//       if (checked) {
+//         return { ...prev, [fieldLabel]: [...currentValues, optionValue] }
+//       } else {
+//         return { ...prev, [fieldLabel]: currentValues.filter((v) => v !== optionValue) }
+//       }
+//     })
+//   }
+
+//   // ✅ Render fields
+//   const renderField = (field, index) => {
+//     const { label, type, required, options } = field
+//     const value = formData[label] || ""
+
+//     const parseOptions = (optionsData) => {
+//       if (!optionsData) return []
+//       if (Array.isArray(optionsData)) return optionsData
+//       const optionsString = String(optionsData)
+//       try {
+//         const parsed = JSON.parse(optionsString)
+//         return Array.isArray(parsed) ? parsed : []
+//       } catch {
+//         return optionsString
+//           .split(",")
+//           .map((o) => o.trim())
+//           .filter((o) => o.length > 0)
+//       }
+//     }
+
+//     switch (type) {
+//       case "text":
+//         return (
+//           <>
+//             <label>{label} {required && "*"}</label>
+//             <input
+//               type="text"
+//               value={value}
+//               onChange={(e) => handleInputChange(label, e.target.value)}
+//               required={required}
+//             />
+//           </>
+//         )
+//       case "date":
+//         return (
+//           <>
+//             <label>{label} {required && "*"}</label>
+//             <input
+//               type="date"
+//               value={value}
+//               onChange={(e) => handleInputChange(label, e.target.value)}
+//               required={required}
+//             />
+//           </>
+//         )
+//       case "radio":
+//         return (
+//           <>
+//             <label>{label} {required && "*"}</label>
+//             <div className="radio-group horizontal">
+//               {parseOptions(options).map((option, i) => (
+//                 <label key={i} className="radio-option">
+//                   <input
+//                     type="radio"
+//                     name={`field-${index}`}
+//                     value={option}
+//                     checked={value === option}
+//                     onChange={(e) => handleInputChange(label, e.target.value)}
+//                     required={required}
+//                   />
+//                   <span className="radio-custom"></span>
+//                   {option}
+//                 </label>
+//               ))}
+//             </div>
+//           </>
+//         )
+//       default:
+//         return (
+//           <>
+//             <label>{label} {required && "*"}</label>
+//             <input
+//               type="text"
+//               value={value}
+//               onChange={(e) => handleInputChange(label, e.target.value)}
+//               required={required}
+//             />
+//           </>
+//         )
+//     }
+//   }
+
+//   // ✅ Group fields into rows (2 per row, full width for textarea/checkbox-group)
+//   const groupFieldsIntoRows = (fields) => {
+//     const rows = []
+//     let currentRow = []
+
+//     fields.forEach((field) => {
+//       const isFullWidth = field.type === "textarea" || field.type === "checkbox-group"
+//       if (isFullWidth) {
+//         if (currentRow.length > 0) {
+//           rows.push(currentRow)
+//           currentRow = []
+//         }
+//         rows.push([field])
+//       } else {
+//         currentRow.push(field)
+//         if (currentRow.length === 2) {
+//           rows.push(currentRow)
+//           currentRow = []
+//         }
+//       }
+//     })
+
+//     if (currentRow.length > 0) rows.push(currentRow)
+//     return rows
+//   }
+
+//   // ✅ Submit handler
+//   const handleSubmit = async () => {
+//     try {
+//       setIsSaving(true)
+//       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/open/workstream3/${recordId}`, {
+//         method: "PUT",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ submission: formData }),
+//       })
+//       const result = await res.json()
+//       if (result.success) {
+//         alert("Record updated successfully")
+//         if (onSave) onSave(result.data)
+//         onBack()
+//       } else {
+//         alert("Failed to update record")
+//       }
+//     } catch (err) {
+//       console.error("Update error:", err)
+//       alert("Error updating record")
+//     } finally {
+//       setIsSaving(false)
+//     }
+//   }
+
+//   if (loading) return <div className="form-container"><p>Loading...</p></div>
+
+//   const fieldRows = groupFieldsIntoRows(formSchema)
+
+//   return (
+//     <div className="form-container-edit">
+//       <div className="form-content">
+
+//           <button
+//           onClick={onBack}
+//           style={{
+//             display: "flex",
+//             alignItems: "center",
+//             gap: "8px",
+//             background: "transparent",
+//             border: "none",
+//             color: "#6b7280",
+//             cursor: "pointer",
+//             fontSize: "14px",
+//             marginBottom: "16px",
+//             padding: "8px 0",
+//           }}
+//         >
+//           ← Back to Workstream 3
+//         </button>
+//           <h2 className="form-title">Edit Workstream 3 Record</h2>
+    
+
+//         <form>
+//           {fieldRows.map((row, rowIndex) => (
+//             <div key={rowIndex} className={row.length === 1 ? "form-row single" : "form-row"}>
+//               {row.map((field, i) => (
+//                 <div key={i} className="form-group">
+//                   {renderField(field, i)}
+//                 </div>
+//               ))}
+//             </div>
+//           ))}
+//         </form>
+
+//         <button onClick={handleSubmit} className="submit-button" disabled={isSaving}>
+//           {isSaving ? "Saving..." : <><Save size={16} /> Save Changes</>}
+//         </button>
+//       </div>
+//     </div>
+//   )
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Save } from "lucide-react"
+import { Save } from "lucide-react"
 import "../styles/Form.css"
 
 export default function EditWorkstream3({ recordId, onBack, onSave }) {
@@ -151,9 +417,7 @@ export default function EditWorkstream3({ recordId, onBack, onSave }) {
       const data = await res.json()
       if (data.success) {
         const parsed =
-          typeof data.data.submission === "string"
-            ? JSON.parse(data.data.submission)
-            : data.data.submission
+          typeof data.data.submission === "string" ? JSON.parse(data.data.submission) : data.data.submission
         setFormData(parsed)
       }
     } catch (err) {
@@ -184,38 +448,122 @@ export default function EditWorkstream3({ recordId, onBack, onSave }) {
     const { label, type, required, options } = field
     const value = formData[label] || ""
 
+    // Handle special expiry date formatting
+    const isExpiryField = label.toLowerCase().includes("expiry") && type === "text"
+
     const parseOptions = (optionsData) => {
+      // Handle null, undefined, or empty values
       if (!optionsData) return []
+
+      // If already an array, return it
       if (Array.isArray(optionsData)) return optionsData
+
+      // Convert to string if it's not already a string
       const optionsString = String(optionsData)
+
       try {
+        // Try parsing as JSON first
         const parsed = JSON.parse(optionsString)
         return Array.isArray(parsed) ? parsed : []
-      } catch {
+      } catch (error) {
+        // If JSON parsing fails, treat as comma-separated string
         return optionsString
           .split(",")
-          .map((o) => o.trim())
-          .filter((o) => o.length > 0)
+          .map((option) => option.trim())
+          .filter((option) => option.length > 0)
       }
+    }
+
+    const handleExpiryDateChange = (fieldLabel, value) => {
+      // Remove any non-digit characters
+      let cleaned = value.replace(/\D/g, "")
+
+      // Add slash after 2 digits
+      if (cleaned.length >= 2) {
+        cleaned = cleaned.substring(0, 2) + "/" + cleaned.substring(2, 4)
+      }
+
+      // Limit to MM/YY format
+      if (cleaned.length > 5) {
+        cleaned = cleaned.substring(0, 5)
+      }
+
+      handleInputChange(fieldLabel, cleaned)
     }
 
     switch (type) {
       case "text":
         return (
           <>
-            <label>{label} {required && "*"}</label>
+            <label>
+              {label} {required && "*"}
+            </label>
             <input
               type="text"
+              placeholder={`Enter ${label.toLowerCase()}`}
+              value={value}
+              onChange={(e) =>
+                isExpiryField ? handleExpiryDateChange(label, e.target.value) : handleInputChange(label, e.target.value)
+              }
+              required={required}
+              {...(isExpiryField && {
+                pattern: "^(0[1-9]|1[0-2])\\/([0-9]{2})$",
+                maxLength: "5",
+                title: "Enter expiry date in MM/YY format",
+              })}
+            />
+            {isExpiryField && <div className="help-text">Enter in MM/YY format (e.g., 09/25)</div>}
+          </>
+        )
+
+      case "textarea":
+        return (
+          <>
+            <label>
+              {label} {required && "*"}
+            </label>
+            <textarea
+              placeholder={`Enter ${label.toLowerCase()}`}
               value={value}
               onChange={(e) => handleInputChange(label, e.target.value)}
               required={required}
+              rows="3"
+              style={{
+                width: "100%",
+                padding: "12px",
+                border: "2px solid #e9ecef",
+                borderRadius: "8px",
+                fontSize: "14px",
+                fontFamily: "inherit",
+                resize: "vertical",
+              }}
             />
           </>
         )
+
+      case "number":
+        return (
+          <>
+            <label>
+              {label} {required && "*"}
+            </label>
+            <input
+              type="number"
+              placeholder={`Enter ${label.toLowerCase()}`}
+              value={value}
+              onChange={(e) => handleInputChange(label, e.target.value)}
+              required={required}
+              {...(label.toLowerCase().includes("amount") && { step: "0.01" })}
+            />
+          </>
+        )
+
       case "date":
         return (
           <>
-            <label>{label} {required && "*"}</label>
+            <label>
+              {label} {required && "*"}
+            </label>
             <input
               type="date"
               value={value}
@@ -224,10 +572,78 @@ export default function EditWorkstream3({ recordId, onBack, onSave }) {
             />
           </>
         )
+
+      case "email":
+        return (
+          <>
+            <label>
+              {label} {required && "*"}
+            </label>
+            <input
+              type="email"
+              placeholder={`Enter ${label.toLowerCase()}`}
+              value={value}
+              onChange={(e) => handleInputChange(label, e.target.value)}
+              required={required}
+            />
+          </>
+        )
+
+      case "url":
+        return (
+          <>
+            <label>
+              {label} {required && "*"}
+            </label>
+            <input
+              type="url"
+              placeholder={`Enter ${label.toLowerCase()}`}
+              value={value}
+              onChange={(e) => handleInputChange(label, e.target.value)}
+              required={required}
+            />
+          </>
+        )
+
+      case "password":
+        return (
+          <>
+            <label>
+              {label} {required && "*"}
+            </label>
+            <input
+              type="password"
+              placeholder={`Enter ${label.toLowerCase()}`}
+              value={value}
+              onChange={(e) => handleInputChange(label, e.target.value)}
+              required={required}
+            />
+          </>
+        )
+
+      case "select":
+        return (
+          <>
+            <label>
+              {label} {required && "*"}
+            </label>
+            <select value={value} onChange={(e) => handleInputChange(label, e.target.value)} required={required}>
+              <option value="">Select {label.toLowerCase()}</option>
+              {parseOptions(options).map((option, optIndex) => (
+                <option key={optIndex} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </>
+        )
+
       case "radio":
         return (
           <>
-            <label>{label} {required && "*"}</label>
+            <label>
+              {label} {required && "*"}
+            </label>
             <div className="radio-group horizontal">
               {parseOptions(options).map((option, i) => (
                 <label key={i} className="radio-option">
@@ -246,12 +662,96 @@ export default function EditWorkstream3({ recordId, onBack, onSave }) {
             </div>
           </>
         )
+
+      case "checkbox":
+        return (
+          <>
+            <label className="radio-option">
+              <input
+                type="checkbox"
+                checked={value === true || value === "true"}
+                onChange={(e) => handleInputChange(label, e.target.checked)}
+                required={required}
+              />
+              <span className="radio-custom"></span>
+              {label} {required && "*"}
+            </label>
+          </>
+        )
+
+      case "checkbox-group":
+        return (
+          <>
+            <label>
+              {label} {required && "*"}
+            </label>
+            <div className="radio-group">
+              {parseOptions(options).map((option, optIndex) => (
+                <label key={optIndex} className="radio-option">
+                  <input
+                    type="checkbox"
+                    checked={(value || []).includes(option)}
+                    onChange={(e) => handleCheckboxGroupChange(label, option, e.target.checked)}
+                  />
+                  <span className="radio-custom"></span>
+                  {option}
+                </label>
+              ))}
+            </div>
+          </>
+        )
+
+      case "file":
+        return (
+          <>
+            <label>
+              {label} {required && "*"}
+            </label>
+            <input type="file" onChange={(e) => handleInputChange(label, e.target.files[0])} required={required} />
+          </>
+        )
+
+      case "color":
+        return (
+          <>
+            <label>
+              {label} {required && "*"}
+            </label>
+            <input
+              type="color"
+              value={value || "#000000"}
+              onChange={(e) => handleInputChange(label, e.target.value)}
+              required={required}
+            />
+          </>
+        )
+
+      case "range":
+        return (
+          <>
+            <label>
+              {label} {required && "*"} (Value: {value || 0})
+            </label>
+            <input
+              type="range"
+              value={value || 0}
+              onChange={(e) => handleInputChange(label, e.target.value)}
+              required={required}
+              min="0"
+              max="100"
+            />
+          </>
+        )
+
       default:
         return (
           <>
-            <label>{label} {required && "*"}</label>
+            <label>
+              {label} {required && "*"}
+            </label>
             <input
               type="text"
+              placeholder={`Enter ${label.toLowerCase()}`}
               value={value}
               onChange={(e) => handleInputChange(label, e.target.value)}
               required={required}
@@ -312,15 +812,19 @@ export default function EditWorkstream3({ recordId, onBack, onSave }) {
     }
   }
 
-  if (loading) return <div className="form-container"><p>Loading...</p></div>
+  if (loading)
+    return (
+      <div className="form-container">
+        <p>Loading...</p>
+      </div>
+    )
 
   const fieldRows = groupFieldsIntoRows(formSchema)
 
   return (
     <div className="form-container-edit">
       <div className="form-content">
-
-          <button
+        <button
           onClick={onBack}
           style={{
             display: "flex",
@@ -337,9 +841,7 @@ export default function EditWorkstream3({ recordId, onBack, onSave }) {
         >
           ← Back to Workstream 3
         </button>
-          <h2 className="form-title">Edit Workstream 3 Record</h2>
-    
-
+        <h2 className="form-title">Edit Workstream 3 Record</h2>
         <form>
           {fieldRows.map((row, rowIndex) => (
             <div key={rowIndex} className={row.length === 1 ? "form-row single" : "form-row"}>
@@ -351,9 +853,14 @@ export default function EditWorkstream3({ recordId, onBack, onSave }) {
             </div>
           ))}
         </form>
-
         <button onClick={handleSubmit} className="submit-button" disabled={isSaving}>
-          {isSaving ? "Saving..." : <><Save size={16} /> Save Changes</>}
+          {isSaving ? (
+            "Saving..."
+          ) : (
+            <>
+              <Save size={16} /> Save Changes
+            </>
+          )}
         </button>
       </div>
     </div>
