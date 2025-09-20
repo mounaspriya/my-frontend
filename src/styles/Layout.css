@@ -3,13 +3,14 @@
   height: 100vh;
   width: 100vw;
   font-family: sans-serif;
-  overflow: hidden;
+ 
 }
 
 .sidebar {
-  width: 220px;
+  width: 170px;
   background-color: #fff;
-  padding: 20px;
+
+
   border-right: 1px solid #ddd;
   height: 100vh;
   position: sticky;
@@ -37,6 +38,8 @@
   flex-grow: 1;
   padding: 20px;
   background-color: #f8f9fa;
+   overflow-y: auto;   /* ✅ allow vertical scroll */
+  height: 100vh; 
 }
 
 .topbar {
@@ -69,13 +72,7 @@
   border-radius: 50%;
 }
 
-.sidebar {
-  width: 220px;
-  background-color: #fff;
-  color: #1e1e2f;
-  padding: 20px;
-  height: 100vh;
-}
+
 
 .nav-links a,
 .submenu-links a {
@@ -100,4 +97,22 @@
 
 .submenu-links {
   margin-left: 15px;
+}
+/* Logo Styling */
+.logo-container {
+  display: flex;
+
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.logo-image {
+  max-width: 100px;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease-in-out;
+}
+
+.logo-image:hover {
+  transform: scale(1.05);
 }

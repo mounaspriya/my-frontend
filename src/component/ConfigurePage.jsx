@@ -1470,6 +1470,9 @@ const ConfigurePage = () => {
   return (
     <div className="admin-dashboard-container">
       <Sidebar />
+
+     
+
       <div className="main-content">
            <header className="topbar">
                <h2 style={{ textAlign: "center" }}>Configure Workstreams</h2>
@@ -1656,8 +1659,12 @@ const ConfigurePage = () => {
           </div>
         </div>
       </div>
+
       {/* ... existing styles ... */}
       <style>{`
+      .page-content{
+      padding-bottom:20px;
+      }
         .tabs {
           display: flex;
           gap: 12px;
@@ -1689,7 +1696,7 @@ const ConfigurePage = () => {
           margin-top: 16px;
           background: white;
           border-radius: 8px;
-          overflow: hidden;
+         
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         .config-table th {
