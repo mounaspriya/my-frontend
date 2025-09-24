@@ -1916,23 +1916,28 @@ const styles = {
     justifyContent: "center",
     zIndex: 1000,
   },
-  modalBox: {
-    background: "#fff",
-    borderRadius: "8px",
-    padding: "20px",
-    maxWidth: "800px",
-    width: "90%",
-    maxHeight: "80vh",
-    overflowY: "auto",
-  },
-  modalHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "20px",
-    borderBottom: "1px solid #e5e7eb",
-    paddingBottom: "10px",
-  },
+modalBox: {
+  background: "#fff",
+  borderRadius: "8px",
+  display: "flex",
+  flexDirection: "column",  // ⬅ new
+  maxWidth: "800px",
+  width: "90%",
+  maxHeight: "80vh",
+  overflow: "hidden",       // ⬅ prevent modal itself from scrolling
+},
+modalHeader: {
+  position: "sticky",       // ⬅ make header sticky
+  top: 0,                   // ⬅ stick to top
+  background: "#fff",       // ⬅ keep background visible
+  zIndex: 10,               // ⬅ above scrolling content
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "16px 20px",
+  borderBottom: "1px solid #e5e7eb",
+},
+
   closeButton: {
     background: "transparent",
     border: "none",
@@ -2382,7 +2387,8 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
                 <X size={20} />
               </button>
             </div>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+
+            {/* <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <tbody>
                 {Object.entries(allFields).map(([key, label]) => (
                   <tr key={key} style={{ borderBottom: "1px solid #eee" }}>
@@ -2395,7 +2401,24 @@ export default function Workstream2Detail({ workstreamId = "02", onBack }) {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table> */}
+            <div style={{ overflowY: "auto", padding: "16px" }}>
+  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <tbody>
+      {Object.entries(allFields).map(([key, label]) => (
+        <tr key={key} style={{ borderBottom: "1px solid #eee" }}>
+          <td style={{ fontWeight: "600", padding: "8px", width: "40%" }}>{label}</td>
+          <td style={{ padding: "8px" }}>
+            {key === "test_successful"
+              ? getTestSuccessfulBadge(viewRecord[key])
+              : formatFieldValue(viewRecord, key)}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
           </div>
         </div>
       )}
